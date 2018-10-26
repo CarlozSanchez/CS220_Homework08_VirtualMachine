@@ -1,4 +1,9 @@
-//Author info here
+// Programer: Carlos Sanchez
+// Class: CS220 MW 3:30pm - 5:20pm
+// Lst Update: 10/16/2018
+// Version 1.0
+
+
 //TODO: don't forget to document each method in all classes!
 import java.io.FileOutputStream;
 import java.io.FileNotFoundException;

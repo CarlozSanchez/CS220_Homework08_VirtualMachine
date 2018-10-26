@@ -1,0 +1,6 @@
+add
+push constant 15
+push constant 10
+pop static 34
+pop static 45
+add

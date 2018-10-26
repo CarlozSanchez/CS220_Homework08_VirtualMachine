@@ -1,40 +1,99 @@
+// Programer: Carlos Sanchez
+// Class: CS220 MW 3:30pm - 5:20pm
+// Lst Update: 10/16/2018
+// Version 1.0
+
+
 import java.io.File;
 import java.io.IOException;
-import java.util.Scanner;
-import java.util.stream.Stream;
+import java.util.*;
 
-enum CommandType{C_ARITHMETIC, C_PUSH, C_POP, C_LABEL, C_GOTO, C_IF, C_FUNCTION, C_RETURN, C_CALL};
+enum CommandType
+{
+    C_ARITHMETIC, C_PUSH, C_POP, C_LABEL, C_GOTO, C_IF, C_FUNCTION, C_RETURN, C_CALL
+}
 
 public class Parser
 {
+    private final static String DELIMETER = " ";
+    private final static String[] ARITHMETIC_BOOLEAN_COMMANDS = {"add", "sub", "neg", "eq", "gt", "lt", "and", "or", "not"};
+   // private final static String[] MEMORY_ACCESS_COMMANDS = {"push", "pop"};
+   // private final static String[] PROGRAM_FLOW_COMMANDS = {"label", "goto", "if-goto"};
+   // private final static String[] FUNCTION_CALLING_COMMANDS = {"function", "call", "return"};
+
+
+    HashMap<String, CommandType> myHashMap;
+
 
     private File file;
     private Scanner inputStream;
-
-    private String rawLine;
-    private String cleanLine;
     private int lineNumber;
+
+    private String nextCommandLine;
+    private CommandType commandType;
+    private String arg1, arg2;
 
 
     /***
-     * FULL CONSTRUCTOR: opens input file/stream and prepares to parse.
+     * DESCRIPTION: opens input file/stream and prepares to parse.
      * PRECONDITION: provided file is ASM file.
      * POSTCONDITION: if file can't be opened, ends program w/ error message.
      * @param fileName The file to open.
      */
-    public  Parser(String fileName) throws IOException
+    public Parser(String fileName) throws IOException
     {
         file = new File(fileName);
         inputStream = new Scanner(file);
-        resetFields();
+        initializeSets();
         lineNumber = 0;
+        resetFields();
     }
 
+
+    /***
+     * DESCRIPTION: This initializes the hashmap containing a KV pair of command String with their appropriate CommandType.
+     * PRECONDITION: none.
+     * POSTCONDITION: hashmap will be initialized and updated with all required commands.
+     */
+    private void initializeSets()
+    {
+        // arithmeticBooleanSet = new HashSet<String>();
+        myHashMap = new HashMap<String, CommandType>();
+
+        for (String str : ARITHMETIC_BOOLEAN_COMMANDS)
+        {
+            //arithmeticBooleanSet.add(str);
+            myHashMap.put(str, CommandType.C_ARITHMETIC);
+        }
+
+        // Memory Access Commands
+        myHashMap.put("push", CommandType.C_PUSH);
+        myHashMap.put("pop", CommandType.C_POP);
+
+        // Program Flow Commands
+        myHashMap.put("label", CommandType.C_LABEL);
+        myHashMap.put("goto", CommandType.C_GOTO);
+        myHashMap.put("if-goto", CommandType.C_IF);
+
+        // Function Calling Commands
+        myHashMap.put("function", CommandType.C_FUNCTION);
+        myHashMap.put("call", CommandType.C_CALL);
+        myHashMap.put("return", CommandType.C_RETURN);
+    }
+
+
+    /***
+     * DESCRIPTION: Helper method that resets commandType to null. resets nextCommandLine, arg1, arg2 to empty string.
+     * PRECONDITION: this should be automatically called by advane()
+     * POSTCONDITION: commandType set null.  nextCommandLine, arg1, arg2 are set to empty string.
+     */
     private void resetFields()
     {
-        rawLine = "";
-        cleanLine = "";
+        nextCommandLine = "";
+        commandType = null;
+        arg1 = arg2 = "";
     }
+
 
     /***
      * DESCRIPTION: Are there more commands in the input?
@@ -44,7 +103,7 @@ public class Parser
     public boolean hasMoreCommands()
 
     {
-        if(inputStream.hasNextLine())
+        if (inputStream.hasNextLine())
         {
             return true;
         }
@@ -61,56 +120,76 @@ public class Parser
      */
     public void advance()
     {
-        resetFields();
-        rawLine = inputStream.nextLine();
-        cleanLine();
-        parseCommand();
         lineNumber++;
+        resetFields();
+        nextCommandLine = inputStream.nextLine();
+        parseCommand();
     }
 
+
+    /***
+     * DESCRIPTION: Parses the commandType, arg1 , arg2 from nextCommandLine.
+     * PRECONDITION: advance() was called prior to invoking this method.
+     * POSTCONDITION: commandType, arg1, arg2 should be updated if valid arguments where found in nextCommandLine.
+     * otherwise the fields will be either null or empty string.
+     */
     private void parseCommand()
     {
+        String[] command = nextCommandLine.split(DELIMETER);
 
+        this.commandType = myHashMap.get(command[0]);
+
+        if (command.length == 3)
+        {
+            this.arg1 = command[1];
+            this.arg2 = command[2];
+        }
     }
 
     /***
      * DESCRIPTION: Returns the first arg. of the current command. In the case of C_ARITHMETIC, the command itself
      * (add, sub, etc>) is returned. Should not be called in the current command is C_RETURN.
-     * @param argument
+     * PRECONDITION: advance() has been called to update class variable arg1.
+     * POSTCONDITION: The argument contained in arg1 is returned.
+     * @return String containing the first argument.
      */
-    public void arg1(String argument)
+    public String arg1()
     {
-
+        return this.arg1;
     }
 
     /***
      * DESCRIPTION: Returns the second argument of the current command. Should be called only if the current
      * command is C_PUSH, C_POP, C_FUNCTION, or C_CALL.
-     * @param argument
+     * PRECONDITION: advance() has been called to update class variable arg1.
+     * POSTCONDITION: The argument contained in arg2 is returned.
+     * @return String containing the second argument.
      */
-    public void arg2(String argument)
+    public String arg2()
     {
-
+        return this.arg2;
     }
 
+
     /***
-     * METHOD: cleans rawLine by removing whitespace and comments.
-     * PRECONDITION: advance() is called so rawLine has string to clean.
-     * POSTCONDITION: cleanLine is updated with contents of rawLine without comments or whitespace.
+     * DESCRIPTION: this describes the current status of Parser Class Including File Name, Line Number, Next Command Line,
+     * Command Type, Argument 1, Argument 2.
+     * PRECONDITION: none
+     * POSTCONDITION: A String describing the status of Parser Class is returned.
+     * @return String describing the status of Parser Class.
      */
-    private void cleanLine()
+    public String toString()
     {
-        String rawLine = this.rawLine;
+        int firstBuffer = -16;
+        StringBuilder sb = new StringBuilder();
 
-        String line = rawLine.replaceAll(" ", "");
-        line = line.replaceAll("\t", "");
+        sb.append(String.format("%" + firstBuffer + "s" + "%s\n", "File:", file.getName()));
+        sb.append(String.format("%" + firstBuffer + "s" + "%s\n", "Line Number:", lineNumber));
+        sb.append(String.format("%" + firstBuffer + "s" + "%s\n", "Next Command:", nextCommandLine));
+        sb.append(String.format("%" + firstBuffer + "s" + "%s\n", "Command Type:", commandType));
+        sb.append(String.format("%" + firstBuffer + "s" + "%s\n", "Argument 1:", arg1));
+        sb.append(String.format("%" + firstBuffer + "s" + "%s\n", "Argument 2:", arg2));
 
-        int commentLocation = line.indexOf("//");
-        if (commentLocation != -1)
-        {
-            line = line.substring(0, commentLocation);
-        }
-
-        cleanLine = line;
+        return sb.toString();
     }
 }
