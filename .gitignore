@@ -1,3 +1,17 @@
+# IntelliJ
+*.idea
+*.iml
+*.xml
+.idea/workspace.xml
+.idea/misc.xml
+.idea/**
+.DS_Store
+
+# eclipse project file
+.settings/
+.classpath
+.project
+
 # Compiled class file
 *.class
 
@@ -21,3 +35,4 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+/bin/
