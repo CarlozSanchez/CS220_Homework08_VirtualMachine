@@ -5,6 +5,7 @@
 
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
@@ -31,7 +32,7 @@ public class Parser
 
     private String nextCommandLine;
     private CommandType commandType;
-    private String arg1, arg2;
+    private String command, arg1, arg2;
 
 
     /***
@@ -40,7 +41,7 @@ public class Parser
      * POSTCONDITION: if file can't be opened, ends program w/ error message.
      * @param fileName The file to open.
      */
-    public Parser(String fileName) throws IOException
+    public Parser(String fileName) throws FileNotFoundException
     {
         file = new File(fileName);
         inputStream = new Scanner(file);
@@ -91,7 +92,7 @@ public class Parser
     {
         nextCommandLine = "";
         commandType = null;
-        arg1 = arg2 = "";
+        command = arg1 = arg2 = "";
     }
 
 
@@ -138,6 +139,7 @@ public class Parser
         String[] command = nextCommandLine.split(DELIMETER);
 
         this.commandType = myHashMap.get(command[0]);
+        this.command = command[0];
 
         if (command.length == 3)
         {
@@ -145,6 +147,13 @@ public class Parser
             this.arg2 = command[2];
         }
     }
+
+    public CommandType commandType()
+    {
+        return this.commandType;
+    }
+
+    public String command(){return this.command;}
 
     /***
      * DESCRIPTION: Returns the first arg. of the current command. In the case of C_ARITHMETIC, the command itself
@@ -187,6 +196,7 @@ public class Parser
         sb.append(String.format("%" + firstBuffer + "s" + "%s\n", "Line Number:", lineNumber));
         sb.append(String.format("%" + firstBuffer + "s" + "%s\n", "Next Command:", nextCommandLine));
         sb.append(String.format("%" + firstBuffer + "s" + "%s\n", "Command Type:", commandType));
+        sb.append(String.format("%" + firstBuffer + "s" + "%s\n", "Command: " , command));
         sb.append(String.format("%" + firstBuffer + "s" + "%s\n", "Argument 1:", arg1));
         sb.append(String.format("%" + firstBuffer + "s" + "%s\n", "Argument 2:", arg2));
 

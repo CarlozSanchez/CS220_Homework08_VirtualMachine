@@ -34,6 +34,14 @@ public class VMTester
     }
 
     @Test
+    public void testEnumString()
+    {
+        String str = CommandType.C_ARITHMETIC.toString();
+
+        System.out.println("The word: " + str);
+    }
+
+    @Test
     public void test1()
     {
         System.out.println(parser);
@@ -52,7 +60,16 @@ public class VMTester
 
         parser.advance();
         System.out.println(parser);
+    }
 
+    @Test
+    public void test2()
+    {
+        while(parser.hasMoreCommands())
+        {
+            parser.advance();
+            System.out.println(parser);
+        }
     }
 
     @Test
