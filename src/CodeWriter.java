@@ -100,7 +100,7 @@ public class CodeWriter
     private void singlePopOperation()
     {
         printWriter.println("@SP");         // go to Stack Pointer
-        printWriter.println("A=M-1");         // go to Top of Stack
+        printWriter.println("A=M-1");       // go to Top of Stack
     }
 
     private void doublePopOperation()
@@ -137,7 +137,6 @@ public class CodeWriter
         printWriter.println("D=D+M");   // Calculate equality of D == M
 
         printWriter.println("M=-1");    // set top of stack to true
-
 
         printWriter.println("@skip" + labelCounter);
         printWriter.println("D;JEQ");

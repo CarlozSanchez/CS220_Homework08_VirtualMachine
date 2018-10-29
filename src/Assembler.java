@@ -22,7 +22,8 @@ public class Assembler {
 	
 	// print out "done" message to user
 	// close output file stream
-	public static void main(String[] args) {
+	public static void main(String[] args)
+	{
 		
 		String inputFileName, outputFileName;
 		PrintWriter outputFile = null; //keep compiler happy
