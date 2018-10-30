@@ -128,8 +128,8 @@ public class CodeWriter
     /**
      * DESCRIPTION: Performs an Addition command by popping 2 values from stack, adding them, then pushing result into stack.
      * PRECONDITION: none
-     * POSTCONDITION: Writes to file the assembly code for going to top of stack, pop first value and store in D, decrement
-     * address by 1, pop second value and add with first value, finally push the result into stack.
+     * POSTCONDITION: The file will be appended with the commands for:  go to SP, decrement SP address then go to new
+     * address, Pop value and Store in D, decrement current address, update M with sum of D + M
      */
     private void writeAdd()
     {
@@ -142,8 +142,8 @@ public class CodeWriter
      * DESCRIPTION: Performs an Subtraction command by popping 2 values from stack, then subtracts the first popped value
      * from the second popped value, finally the result is pushed back into stack.
      * PRECONDITION: none
-     * POSTCONDITION: Writes to file the assembly code for going to top of stack, pop first value and store in D, decrement
-     * address by 1, pop second value , subtract first value from second value, finally push the result into stack.
+     * POSTCONDITION: The file will be appended with the commands for: go to SP, decrement SP address then go to new
+     * address, Pop value and Store in D, decrement current address, update M with difference of M - D
      */
     private void writeSub()
     {
@@ -152,9 +152,11 @@ public class CodeWriter
     }
 
     /**
-     * DESCRIPTION:
-     * PRECONDITION:
-     * POSTCONDITION:
+     * DESCRIPTION: Performs a Negation command by popping a single value from stack, then performs a bit wise negation
+     * on the value, finally the result is pushed into stack.
+     * PRECONDITION: none.
+     * POSTCONDITION: The file will be appended with the commands for: go to SP, go to SP address - 1, update M
+     * with bit-wise negation of M
      */
     private void writeNeg()
     {
@@ -165,7 +167,10 @@ public class CodeWriter
      /**
      * DESCRIPTION:
      * PRECONDITION:
-     * POSTCONDITION:
+     * POSTCONDITION: The file will be appended with the commands for: go to SP, decrement SP address then go to new
+      * address, Pop value and Store in D, decrement current address, Conver D to negative number, update D with sum of
+      * D+M, Set M to TRUE, go to SKIP address, jump if D == 0, go to SP, go to SP address -1, Set M to FALSE. ("skip)"
+      * is written.
      */
     private void writeEq()
     {
@@ -191,7 +196,9 @@ public class CodeWriter
     /**
      * DESCRIPTION:
      * PRECONDITION:
-     * POSTCONDITION:
+     * POSTCONDITION: The file will be appended with the commands for: go to SP, decrement SP address then go to new
+     * address, Pop value and Store in D, decrement current address, update D with difference of M - D, Set M to TRUE,
+     * go to SKIP address, jump if D > 0, go to SP, go to SP address -1, Set M to FALSE. "(SKIP)" is written.
      */
     private void writeGt()
     {
@@ -205,7 +212,9 @@ public class CodeWriter
     /**
      * DESCRIPTION:
      * PRECONDITION:
-     * POSTCONDITION:
+     * POSTCONDITION: The file will be appended with the commands for: go to SP, decrement SP address then go to new
+     * address, Pop value and Store in D, decrement current address, update D with difference of D - M, Set M to TRUE,
+     * go to SKIP address, jump if D < 0, go to SP, go to SP address - 1, Set M to FALSE. "(SKIP)" is written.
      */
     private void writeLt()
     {
@@ -219,7 +228,8 @@ public class CodeWriter
     /**
      * DESCRIPTION:
      * PRECONDITION:
-     * POSTCONDITION:
+     * POSTCONDITION: The file will be appended with the commands for: Set M to TRUE, go to SKIP address, jump if D < 0,
+     * go to SP, go to SP address - 1, Set M to FALSE. "(SKIP)" is written.
      */
     private void finish_GT_LT()
     {
@@ -240,7 +250,8 @@ public class CodeWriter
     /**
      * DESCRIPTION:
      * PRECONDITION:
-     * POSTCONDITION:
+     * POSTCONDITION: The file will be appended with the commands for:  go to SP, decrement SP address then go to new
+     * address, Pop value and Store in D, decrement current address, update M with result of D & M
      */
     private void writeAnd()
     {
@@ -251,7 +262,8 @@ public class CodeWriter
     /**
      * DESCRIPTION:
      * PRECONDITION:
-     * POSTCONDITION:
+     * POSTCONDITION: The file will be appended with the commands for:  go to SP, decrement SP address then go to new
+     * address, Pop value and Store in D, decrement current address, update M with result of D | M
      */
     private void writeOr()
     {
@@ -263,7 +275,8 @@ public class CodeWriter
     /**
      * DESCRIPTION:
      * PRECONDITION:
-     * POSTCONDITION:
+     * POSTCONDITION: The file will be appended with the commands for: go to SP, go to SP address - 1, update M
+     * with bit-wise not of M
      */
     private void writeNot()
     {
@@ -274,9 +287,10 @@ public class CodeWriter
     /***
      * DESCRIPTION: Writes the assembly code that is the translation of the given command, where command is either
      * C_PUSH or C_POP
-     * @param command
-     * @param segment
-     * @param index
+     * PRECONDITION: commands, segment, index must be valid arguments.
+     * @param command The command to operate, either "push" or "pop" command.
+     * @param segment The segment of memory to operate on, "static", 'local", "constant"
+     * @param index The index of the segment to push from, or pop too.
      */
     public void writePushPop(String command, String segment, int index)
     {
@@ -309,9 +323,9 @@ public class CodeWriter
 
 
     /**
-     * DESCRIPTION:
-     * PRECONDITION:
-     * POSTCONDITION:
+     * DESCRIPTION: Writes to file The Operation to Pop value from stack and store in D.
+     * PRECONDITION: none.
+     * POSTCONDITION: The file will be appended with the commands for: Go to index, Store literal value in D,
      * @param segment
      * @param index
      */
@@ -333,17 +347,18 @@ public class CodeWriter
     }
 
     /**
-     * DESCRIPTION:
-     * PRECONDITION:
-     * POSTCONDITION:
+     * DESCRIPTION: Pushes the value stored in D to stack.
+     * PRECONDITION: The file was previously appended with a command to Store the desired push value in D.
+     * POSTCONDITION: The file will be appended with the commands for: go to SP, increment SP address, go to SP address -1 ,
+     * update M withe value in D.
      */
     private void writePush()
     {
-        // increment sp
+        // increment SP address
         printWriter.println("@SP");
         printWriter.println("M=M+1");
 
-        // store value in D at top of stack
+        // update top of stack with value stored in D
         printWriter.println("A=M-1");
         printWriter.println("M=D");
     }
@@ -435,22 +450,4 @@ public class CodeWriter
     {
         this.printWriter.close();
     }
-//
-//    private void initializePointers()
-//    {
-//        // Initialize Stack Pointer
-//        printWriter.println("// Initializing SP");
-//        printWriter.println("@" + STACK_START);
-//        printWriter.println("D=A");
-//        printWriter.println("@SP");
-//        printWriter.println("M=D");
-//
-//        // Initialize Static Pointer
-//
-////        // Initialize Local Pointer
-////        printWriter.println("@LCL");
-////        printWriter.println("M=" + 0);
-//
-//        printWriter.println();
-//    }
 }
