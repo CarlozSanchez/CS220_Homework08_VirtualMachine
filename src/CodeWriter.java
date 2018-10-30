@@ -4,10 +4,7 @@
 // Version 1.0
 
 
-import java.io.File;
 import java.io.PrintWriter;
-import java.util.stream.Stream;
-
 
 public class CodeWriter
 {
@@ -22,6 +19,8 @@ public class CodeWriter
     private PrintWriter printWriter;
 
     private int labelCounter;
+
+    String fileName;
 
 
     /***
@@ -40,7 +39,7 @@ public class CodeWriter
      */
     private void setFileName(String fileName)
     {
-
+        this.fileName = fileName;
     }
 
     /***
@@ -97,12 +96,27 @@ public class CodeWriter
         printWriter.println();
     }
 
+    /**
+     * DESCRIPTION: Performs the first steps of a signle pop operation by goin
+     * to the top of stack.
+     * PRECONDITION: none.
+     * POSTCONDITION: Writes to file the assembly code that will go to address of top of stack.
+     */
     private void singlePopOperation()
     {
         printWriter.println("@SP");         // go to Stack Pointer
         printWriter.println("A=M-1");       // go to Top of Stack
     }
 
+    /**
+     * DESCRIPTION: Performs the first steps of a double pop operation by popping
+     * out top of stack into D, then decrements SP pointer, then goes to new top of stack.
+     * PRECONDITION: none.
+     * POSTCONDITION: Writes to file the assembly code that will go to address
+     * of top of stack. Pop off value at top of stack, store it in D. Then
+     * decrement the stack pointer.
+     *
+     */
     private void doublePopOperation()
     {
         printWriter.println("@SP");         // go to Stack Pointer
@@ -259,13 +273,6 @@ public class CodeWriter
 
     private void writePush()
     {
-        // load D
-        // loadDFrom(String segment, int index);
-
-        // D = index
-        // printWriter.println("@" + index);
-        // printWriter.println("D=A");
-
         // increment sp
         printWriter.println("@SP");
         printWriter.println("M=M+1");
@@ -308,6 +315,7 @@ public class CodeWriter
             case "static":
                 // Load D from static segment
                 // printWriter.println("@")
+                printWriter.println("@" + fileName + "." + index);
 
                 break;
 
