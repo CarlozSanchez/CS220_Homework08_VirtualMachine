@@ -25,6 +25,7 @@ public class CodeWriter
 
     /***
      * DESCRIPTION: Opens the output file/stream and gets ready to write into it.
+     * PRECONDITION
      */
     CodeWriter(PrintWriter outputFile)
     {
@@ -35,7 +36,7 @@ public class CodeWriter
 
     /***
      * DESCRIPTION: Informs the code writer that the tranlation of a new VM file is started.
-     * @param fileName
+     * @param fileName The file to set
      */
     private void setFileName(String fileName)
     {
@@ -97,10 +98,9 @@ public class CodeWriter
     }
 
     /**
-     * DESCRIPTION: Performs the first steps of a signle pop operation by goin
-     * to the top of stack.
+     * DESCRIPTION: Performs the first steps of a single pop operation by going to the top of stack.
      * PRECONDITION: none.
-     * POSTCONDITION: Writes to file the assembly code that will go to address of top of stack.
+     * POSTCONDITION: Writes to file the assembly code for A-register to hold top of stack address.
      */
     private void singlePopOperation()
     {
@@ -109,8 +109,8 @@ public class CodeWriter
     }
 
     /**
-     * DESCRIPTION: Performs the first steps of a double pop operation by popping
-     * out top of stack into D, then decrements SP pointer, then goes to new top of stack.
+     * DESCRIPTION: Performs the first steps of a double pop operation by going to SP, decrement SP address and go to
+     * new SP address, Store contents of 1st Pop value into D, go to location of 2nd value to be popped.
      * PRECONDITION: none.
      * POSTCONDITION: Writes to file the assembly code that will go to address
      * of top of stack. Pop off value at top of stack, store it in D. Then
@@ -125,24 +125,48 @@ public class CodeWriter
         printWriter.println("A=A-1");       // go to current address - 1
     }
 
+    /**
+     * DESCRIPTION: Performs an Addition command by popping 2 values from stack, adding them, then pushing result into stack.
+     * PRECONDITION: none
+     * POSTCONDITION: Writes to file the assembly code for going to top of stack, pop first value and store in D, decrement
+     * address by 1, pop second value and add with first value, finally push the result into stack.
+     */
     private void writeAdd()
     {
         doublePopOperation();
         printWriter.println("M=D+M");       // update memory with D + M
     }
 
+
+    /**
+     * DESCRIPTION: Performs an Subtraction command by popping 2 values from stack, then subtracts the first popped value
+     * from the second popped value, finally the result is pushed back into stack.
+     * PRECONDITION: none
+     * POSTCONDITION: Writes to file the assembly code for going to top of stack, pop first value and store in D, decrement
+     * address by 1, pop second value , subtract first value from second value, finally push the result into stack.
+     */
     private void writeSub()
     {
         doublePopOperation();
         printWriter.println("M=M-D");    // update memory with the difference of second Pop - firstPop
     }
 
+    /**
+     * DESCRIPTION:
+     * PRECONDITION:
+     * POSTCONDITION:
+     */
     private void writeNeg()
     {
         singlePopOperation();
         printWriter.println("M=-M");      // Pop value, negate value, push result
     }
 
+     /**
+     * DESCRIPTION:
+     * PRECONDITION:
+     * POSTCONDITION:
+     */
     private void writeEq()
     {
         doublePopOperation();
@@ -164,6 +188,11 @@ public class CodeWriter
         labelCounter++;
     }
 
+    /**
+     * DESCRIPTION:
+     * PRECONDITION:
+     * POSTCONDITION:
+     */
     private void writeGt()
     {
         doublePopOperation();
@@ -173,6 +202,11 @@ public class CodeWriter
         finish_GT_LT();
     }
 
+    /**
+     * DESCRIPTION:
+     * PRECONDITION:
+     * POSTCONDITION:
+     */
     private void writeLt()
     {
         doublePopOperation();
@@ -182,6 +216,11 @@ public class CodeWriter
         finish_GT_LT();
     }
 
+    /**
+     * DESCRIPTION:
+     * PRECONDITION:
+     * POSTCONDITION:
+     */
     private void finish_GT_LT()
     {
         printWriter.println("M=-1");    // set top of stack to true
@@ -198,12 +237,22 @@ public class CodeWriter
         labelCounter++;
     }
 
+    /**
+     * DESCRIPTION:
+     * PRECONDITION:
+     * POSTCONDITION:
+     */
     private void writeAnd()
     {
         doublePopOperation();
         printWriter.println("M=D&M");
     }
 
+    /**
+     * DESCRIPTION:
+     * PRECONDITION:
+     * POSTCONDITION:
+     */
     private void writeOr()
     {
         doublePopOperation();
@@ -211,6 +260,11 @@ public class CodeWriter
 
     }
 
+    /**
+     * DESCRIPTION:
+     * PRECONDITION:
+     * POSTCONDITION:
+     */
     private void writeNot()
     {
         singlePopOperation();
@@ -254,12 +308,19 @@ public class CodeWriter
     }
 
 
+    /**
+     * DESCRIPTION:
+     * PRECONDITION:
+     * POSTCONDITION:
+     * @param segment
+     * @param index
+     */
     private void loadDfromStack(String segment, int index)
     {
         printWriter.println("@" + index);
         printWriter.println("D=A");
 
-        writeAtSegement(segment);       // @segment EX. @THAT, @THIS, @LCL
+        writeAtSegement(segment, index);       // @segment EX. @THAT, @THIS, @LCL
 
         //
         if (!segment.equals("constant"))
@@ -271,6 +332,11 @@ public class CodeWriter
 
     }
 
+    /**
+     * DESCRIPTION:
+     * PRECONDITION:
+     * POSTCONDITION:
+     */
     private void writePush()
     {
         // increment sp
@@ -282,7 +348,14 @@ public class CodeWriter
         printWriter.println("M=D");
     }
 
-    private void writeAtSegement(String segment)
+    /**
+     * DESCRIPTION:
+     * PRECONDITION:
+     * POSTCONDITION:
+     * @param segment
+     * @param index
+     */
+    private void writeAtSegement(String segment, int index)
     {
         switch (segment)
         {
@@ -326,13 +399,20 @@ public class CodeWriter
     }
 
 
+    /**
+     * DESCRIPTION: Performs the steps for Popping a value from the stack to the desired segment[index].
+     * PRECONDITION:
+     * POSTCONDITION:
+     * @param segment
+     * @param index
+     */
     private void writePop(String segment, int index)
     {
 
         printWriter.println("@" + index);   // @index
         printWriter.println("D=A");         // store index as value in D
 
-        writeAtSegement(segment);           // @segment EX. @THAT, @THIS, @LCL
+        writeAtSegement(segment, index);    // @segment EX. @THAT, @THIS, @LCL
         printWriter.println("D=D+M");       // D =  segment[i]
 
         printWriter.println("@R13");        // Go to temp R13

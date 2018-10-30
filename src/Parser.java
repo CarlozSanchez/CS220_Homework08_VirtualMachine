@@ -18,9 +18,9 @@ public class Parser
 {
     private final static String DELIMETER = " ";
     private final static String[] ARITHMETIC_BOOLEAN_COMMANDS = {"add", "sub", "neg", "eq", "gt", "lt", "and", "or", "not"};
-   // private final static String[] MEMORY_ACCESS_COMMANDS = {"push", "pop"};
-   // private final static String[] PROGRAM_FLOW_COMMANDS = {"label", "goto", "if-goto"};
-   // private final static String[] FUNCTION_CALLING_COMMANDS = {"function", "call", "return"};
+    // private final static String[] MEMORY_ACCESS_COMMANDS = {"push", "pop"};
+    // private final static String[] PROGRAM_FLOW_COMMANDS = {"label", "goto", "if-goto"};
+    // private final static String[] FUNCTION_CALLING_COMMANDS = {"function", "call", "return"};
 
 
     HashMap<String, CommandType> myHashMap;
@@ -148,12 +148,32 @@ public class Parser
         }
     }
 
+    /**
+     * DESCRIPTION: Returns one of the following CommandType, C_PUSH, C_POP, C_LABEL, C_GOTO, C_IF-GOTO, C_FUNCTION,
+     * C_CALL, C_RETURN .
+     * PRECONDITION: advance must have been called prior in order for commandType field to be updated.
+     * POSTCONDITION: commandType is updated to command type found in current line, if no matching command type is
+     * recognized the field will be null.
+     * @return a String representing the current command type in String form..
+     */
     public CommandType commandType()
     {
         return this.commandType;
     }
 
-    public String command(){return this.command;}
+
+    /**
+     * DESCRIPTION: Returns the command type of this current line. either "push", "pop", "label", "goto", "if-goto",
+     * "function", "call", "return".
+     * PRECONDITION: advance must have been called prior in order for commandType field to be updated.
+     * POSTCONDITION: command is updated to command type found in current line, if no matching command type is
+     * recognized the field will be empty String.
+     * @return a String representing the current command type in String form..
+     */
+    public String command()
+    {
+        return this.command;
+    }
 
     /***
      * DESCRIPTION: Returns the first arg. of the current command. In the case of C_ARITHMETIC, the command itself
@@ -196,7 +216,7 @@ public class Parser
         sb.append(String.format("%" + firstBuffer + "s" + "%s\n", "Line Number:", lineNumber));
         sb.append(String.format("%" + firstBuffer + "s" + "%s\n", "Next Command:", nextCommandLine));
         sb.append(String.format("%" + firstBuffer + "s" + "%s\n", "Command Type:", commandType));
-        sb.append(String.format("%" + firstBuffer + "s" + "%s\n", "Command: " , command));
+        sb.append(String.format("%" + firstBuffer + "s" + "%s\n", "Command: ", command));
         sb.append(String.format("%" + firstBuffer + "s" + "%s\n", "Argument 1:", arg1));
         sb.append(String.format("%" + firstBuffer + "s" + "%s\n", "Argument 2:", arg2));
 
