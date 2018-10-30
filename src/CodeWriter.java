@@ -6,6 +6,11 @@
 
 import java.io.PrintWriter;
 
+
+/**
+ * CodeWriter.java - This writes the appropriate Arithmetic or Push/Push operation
+ * to destination file.
+ */
 public class CodeWriter
 {
 
@@ -35,7 +40,7 @@ public class CodeWriter
     }
 
     /***
-     * DESCRIPTION: Informs the code writer that the tranlation of a new VM file is started.
+     * DESCRIPTION: Informs the code writer that the translation of a new VM file is started.
      * @param fileName The file to set
      */
     private void setFileName(String fileName)
@@ -45,6 +50,8 @@ public class CodeWriter
 
     /***
      * DESCRIPTION: Writes the assembly code that is the translation of the given arithmetic command.
+     * PRECONDITION: argument should contain a valid command: "add", "sub", "neg", "eq", "gt", "lt", "and", "or", "not
+     * POSTCONDITION: the appropriate method is executed for given command.
      * @param command
      */
     public void writeArithmetic(String command)
@@ -165,8 +172,9 @@ public class CodeWriter
     }
 
      /**
-     * DESCRIPTION:
-     * PRECONDITION:
+     * DESCRIPTION: Performs an Equality operation by popping two values from stack, comparing both value then push the
+      * result(true,false) back into stack.
+     * PRECONDITION: none.
      * POSTCONDITION: The file will be appended with the commands for: go to SP, decrement SP address then go to new
       * address, Pop value and Store in D, decrement current address, Conver D to negative number, update D with sum of
       * D+M, Set M to TRUE, go to SKIP address, jump if D == 0, go to SP, go to SP address -1, Set M to FALSE. ("skip)"
@@ -194,8 +202,9 @@ public class CodeWriter
     }
 
     /**
-     * DESCRIPTION:
-     * PRECONDITION:
+     * DESCRIPTION: Performs a Greater then operation by popping two values from stack, comparing first value bigger then
+     * second value, then storing the result(true,false) in stack.
+     * PRECONDITION: none.
      * POSTCONDITION: The file will be appended with the commands for: go to SP, decrement SP address then go to new
      * address, Pop value and Store in D, decrement current address, update D with difference of M - D, Set M to TRUE,
      * go to SKIP address, jump if D > 0, go to SP, go to SP address -1, Set M to FALSE. "(SKIP)" is written.
@@ -210,7 +219,8 @@ public class CodeWriter
     }
 
     /**
-     * DESCRIPTION:
+     * DESCRIPTION: Performs a Less then operation by popping two values from stack, comparing second  value bigger then
+     * first value, then storing the result(true,false) in stack.
      * PRECONDITION:
      * POSTCONDITION: The file will be appended with the commands for: go to SP, decrement SP address then go to new
      * address, Pop value and Store in D, decrement current address, update D with difference of D - M, Set M to TRUE,
@@ -226,8 +236,9 @@ public class CodeWriter
     }
 
     /**
-     * DESCRIPTION:
-     * PRECONDITION:
+     * DESCRIPTION: Performs the rest of a less then or greater then operation by pushing into stack the result(true,false)
+     * of a previous LT or GT comparison.
+     * PRECONDITION: writeLT() or writeGt() should invoke this method to finish the last steps of it operation.
      * POSTCONDITION: The file will be appended with the commands for: Set M to TRUE, go to SKIP address, jump if D < 0,
      * go to SP, go to SP address - 1, Set M to FALSE. "(SKIP)" is written.
      */
@@ -248,8 +259,9 @@ public class CodeWriter
     }
 
     /**
-     * DESCRIPTION:
-     * PRECONDITION:
+     * DESCRIPTION: Performs an AND operation by popping two values from stack, performing an bit wise AND operation on
+     * both values, then pushing the results back into stack.
+     * PRECONDITION: none.
      * POSTCONDITION: The file will be appended with the commands for:  go to SP, decrement SP address then go to new
      * address, Pop value and Store in D, decrement current address, update M with result of D & M
      */
@@ -260,8 +272,9 @@ public class CodeWriter
     }
 
     /**
-     * DESCRIPTION:
-     * PRECONDITION:
+     * DESCRIPTION: Performs an OR operation by popping two values from stack, performing a bit wise OR operation on
+     * both values, then pushing the result back into stack.
+     * PRECONDITION: none.
      * POSTCONDITION: The file will be appended with the commands for:  go to SP, decrement SP address then go to new
      * address, Pop value and Store in D, decrement current address, update M with result of D | M
      */
@@ -273,8 +286,9 @@ public class CodeWriter
     }
 
     /**
-     * DESCRIPTION:
-     * PRECONDITION:
+     * DESCRIPTION: Performs a NOT operation by popping two values from stack, performing a bit wise NOT operation on
+     * both values, then pushing the result back into stack.
+     * PRECONDITION: none.
      * POSTCONDITION: The file will be appended with the commands for: go to SP, go to SP address - 1, update M
      * with bit-wise not of M
      */
