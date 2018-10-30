@@ -315,8 +315,8 @@ public class CodeWriter
         switch (command)
         {
             case "push":
-                loadDfromStack(segment, index);
-                writePush();
+                loadD(segment, index);
+                writePushD();
                 break;
 
             case "pop":
@@ -333,13 +333,13 @@ public class CodeWriter
 
 
     /**
-     * DESCRIPTION: Writes to file The Operation to Pop value from stack and store in D.
+     * DESCRIPTION: Writes to file The Operation to load D with value of segment[index].
      * PRECONDITION: none.
      * POSTCONDITION: The file will be appended with the commands for: Go to index, Store literal value in D,
      * @param segment
      * @param index
      */
-    private void loadDfromStack(String segment, int index)
+    private void loadD(String segment, int index)
     {
         switch (segment)
         {
@@ -414,7 +414,7 @@ public class CodeWriter
      * POSTCONDITION: The file will be appended with the commands for: go to SP, increment SP address, go to SP address -1 ,
      * update M withe value in D.
      */
-    private void writePush()
+    private void writePushD()
     {
         // increment SP address
         printWriter.println("@SP");
@@ -426,7 +426,7 @@ public class CodeWriter
     }
 
     /**
-     * DESCRIPTION: Performs the steps for Popping a value from the stack to the desired segment[index].
+     * DESCRIPTION: Writes the steps for Popping a value from the stack to the desired segment[index].
      * PRECONDITION:
      * POSTCONDITION:
      * @param segment
