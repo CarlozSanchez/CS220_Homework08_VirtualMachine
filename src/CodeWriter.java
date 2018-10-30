@@ -52,7 +52,7 @@ public class CodeWriter
      * DESCRIPTION: Writes the assembly code that is the translation of the given arithmetic command.
      * PRECONDITION: argument should contain a valid command: "add", "sub", "neg", "eq", "gt", "lt", "and", "or", "not
      * POSTCONDITION: the appropriate method is executed for given command.
-     * @param command
+     * @param command the command to execute.
      */
     public void writeArithmetic(String command)
     {
@@ -309,12 +309,8 @@ public class CodeWriter
     public void writePushPop(String command, String segment, int index)
     {
 
-        // Prints comments to file
+        // Prints the current operation as comment to file.
         printWriter.printf("// %s %s %s\n", command, segment, index);
-
-        //System.out.println("The command: " + command);
-        //System.out.println("The segment " + segment);
-
 
         switch (command)
         {
@@ -345,19 +341,71 @@ public class CodeWriter
      */
     private void loadDfromStack(String segment, int index)
     {
-        printWriter.println("@" + index);
-        printWriter.println("D=A");
-
-        writeAtSegement(segment, index);       // @segment EX. @THAT, @THIS, @LCL
-
-        //
-        if (!segment.equals("constant"))
+        switch (segment)
         {
-            // D = segment[i]
-            printWriter.println("A=M+D");
-            printWriter.println("D=M");
-        }
+            case "constant":
+                loadDwithAddress(index);
+                break;
 
+            case "local":
+                loadDwithAddress(index);
+                printWriter.println("@LCL");
+                goToSegmentIndex_LoadDwithMemory();
+                break;
+
+            case "argument":
+                loadDwithAddress(index);
+                printWriter.println("@ARG");
+                goToSegmentIndex_LoadDwithMemory();
+                break;
+
+            case "this":
+                loadDwithAddress(index);
+                printWriter.println("@THIS");
+                goToSegmentIndex_LoadDwithMemory();
+                break;
+
+            case "that":
+                loadDwithAddress(index);
+                printWriter.println("@THAT");
+                goToSegmentIndex_LoadDwithMemory();
+                break;
+
+            case "temp":
+                loadDwithAddress(index);
+                printWriter.println("@THAT");
+                printWriter.println("A=A+1");
+                goToSegmentIndex_LoadDwithMemory();
+                break;
+
+            case "static":
+                printWriter.println("@" + fileName + "." + index);
+                printWriter.println("D=M");
+                break;
+
+            default:
+                System.out.println("unknown segment \"" + segment + "\" in loadDfromStack");
+                break;
+        }
+    }
+
+    /**
+     * DESCRIPTION: helper method used by loadDfromStack().
+     * @param address
+     */
+    private void loadDwithAddress(int address)
+    {
+        printWriter.println("@" + address);
+        printWriter.println("D=A");
+    }
+
+    /**
+     * DESCRIPTION: helper method used by loadDfromStack().
+     */
+    private void goToSegmentIndex_LoadDwithMemory()
+    {
+        printWriter.println("A=A+D");
+        printWriter.println("D=M");
     }
 
     /**
@@ -375,6 +423,34 @@ public class CodeWriter
         // update top of stack with value stored in D
         printWriter.println("A=M-1");
         printWriter.println("M=D");
+    }
+
+    /**
+     * DESCRIPTION: Performs the steps for Popping a value from the stack to the desired segment[index].
+     * PRECONDITION:
+     * POSTCONDITION:
+     * @param segment
+     * @param index
+     */
+    private void writePop(String segment, int index)
+    {
+
+        printWriter.println("@" + index);   // @index
+        printWriter.println("D=A");         // store index as value in D
+
+        writeAtSegement(segment, index);    // @segment EX. @THAT, @THIS, @LCL
+        printWriter.println("D=D+M");       // D =  segment[i]
+
+        printWriter.println("@R13");        // Go to temp R13
+        printWriter.println("M=D");         // Store destination address
+
+        printWriter.println("@SP");         // go to Stack Pointer
+        printWriter.println("AM=M-1");      // decrement SP, go to new Top of Stack address
+        printWriter.println("D=M");         //  Pop M to D
+
+        printWriter.println("@R13");        // Go to tempR13
+        printWriter.println("A=M");         // go to segment[i]
+        printWriter.println("M=D");         // Store the value of D into memory, segment[i] = D
     }
 
     /**
@@ -428,33 +504,7 @@ public class CodeWriter
     }
 
 
-    /**
-     * DESCRIPTION: Performs the steps for Popping a value from the stack to the desired segment[index].
-     * PRECONDITION:
-     * POSTCONDITION:
-     * @param segment
-     * @param index
-     */
-    private void writePop(String segment, int index)
-    {
 
-        printWriter.println("@" + index);   // @index
-        printWriter.println("D=A");         // store index as value in D
-
-        writeAtSegement(segment, index);    // @segment EX. @THAT, @THIS, @LCL
-        printWriter.println("D=D+M");       // D =  segment[i]
-
-        printWriter.println("@R13");        // Go to temp R13
-        printWriter.println("M=D");         // Store destination address
-
-        printWriter.println("@SP");         // go to Stack Pointer
-        printWriter.println("AM=M-1");      // decrement SP, go to new Top of Stack address
-        printWriter.println("D=M");         //  Pop M to D
-
-        printWriter.println("@R13");        // Go to tempR13
-        printWriter.println("A=M");         // go to segment[i]
-        printWriter.println("M=D");         // Store the value of D into memory, segment[i] = D
-    }
 
 
     /***
