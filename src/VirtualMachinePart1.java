@@ -1,6 +1,6 @@
 // Programer: Carlos Sanchez
 // Class: CS220 MW 3:30pm - 5:20pm
-// Lst Update: 10/29/2018
+// Lst Update: 10/31/2018
 // Version 1.0
 
 
@@ -14,14 +14,8 @@ public class VirtualMachinePart1
 {
     // ALGORITHM:
     // get input file name
-    // create output file name and stream
+    // create output file name
 
-    // create symbol table
-    // do first pass to build symbol table (no output yet!)
-    // do second pass to output translated ASM to HACK code
-
-    // print out "done" message to user
-    // close output file stream
     public static void main(String[] args)
     {
         String inputFileName, outputFileName;
@@ -52,7 +46,7 @@ public class VirtualMachinePart1
 
 
         // TODO: finish driver as algorithm describes
-        writeASM(inputFileName, outputFileName);
+        parse(inputFileName, outputFileName);
     }
 
     /**
@@ -70,7 +64,7 @@ public class VirtualMachinePart1
      * @param fileName
      * @param outputFileName
      */
-    private static void writeASM(String fileName, String outputFileName)
+    private static void parse(String fileName, String outputFileName)
     {
         Parser parser = null;
         CodeWriter codeWriter = null;

@@ -1,6 +1,6 @@
 // Programer: Carlos Sanchez
 // Class: CS220 MW 3:30pm - 5:20pm
-// Lst Update: 10/16/2018
+// Lst Update: 10/31/2018
 // Version 1.0
 
 
@@ -15,7 +15,6 @@ import java.io.PrintWriter;
  */
 public class CodeWriter
 {
-    // private File file;
     String fileName;
     private PrintWriter printWriter;
     private int labelCounter;
@@ -41,6 +40,14 @@ public class CodeWriter
         this.fileName = fileName;
         this.printWriter = new PrintWriter(new FileOutputStream(fileName));
         this.labelCounter = 0;
+    }
+
+    /***
+     * DESCRIPTION: Closes the output file.
+     */
+    public void close()
+    {
+        this.printWriter.close();
     }
 
     /***
@@ -426,6 +433,7 @@ public class CodeWriter
     private void pushSTATIC(int index)
     {
         String temp = "@" + fileName + "." + index;
+
         printWriter.println(temp);              // @Codewriter.i
         printWriter.println("D=M");             // D=M
         pushDintoStack();                       // @SP, M=M+1, A=M-1, M=D
@@ -605,14 +613,5 @@ public class CodeWriter
         printWriter.println("@R13");        // Go to tempR13
         printWriter.println("A=M");         // go to segment[i]
         printWriter.println("M=D");         // Store the value of D into memory, segment[i] = D
-    }
-
-
-    /***
-     * DESCRIPTION: Closes the output file.
-     */
-    public void close()
-    {
-        this.printWriter.close();
     }
 }

@@ -1,12 +1,11 @@
 // Programer: Carlos Sanchez
 // Class: CS220 MW 3:30pm - 5:20pm
-// Lst Update: 10/16/2018
+// Lst Update: 10/31/2018
 // Version 1.0
 
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.*;
 
 enum CommandType
@@ -18,13 +17,8 @@ public class Parser
 {
     private final static String DELIMETER = " ";
     private final static String[] ARITHMETIC_BOOLEAN_COMMANDS = {"add", "sub", "neg", "eq", "gt", "lt", "and", "or", "not"};
-    // private final static String[] MEMORY_ACCESS_COMMANDS = {"push", "pop"};
-    // private final static String[] PROGRAM_FLOW_COMMANDS = {"label", "goto", "if-goto"};
-    // private final static String[] FUNCTION_CALLING_COMMANDS = {"function", "call", "return"};
-
 
     HashMap<String, CommandType> myHashMap;
-
 
     private File file;
     private Scanner inputStream;
