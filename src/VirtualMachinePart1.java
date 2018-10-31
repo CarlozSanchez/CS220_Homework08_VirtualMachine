@@ -31,7 +31,8 @@ public class VirtualMachinePart1
         int romAddress, ramAddress;
 
         //get input file name from command line or console input
-        if(args.length == 1) {
+        if (args.length == 1)
+        {
             System.out.println("command line arg = " + args[0]);
             inputFileName = args[0];
         }
@@ -46,66 +47,69 @@ public class VirtualMachinePart1
             keyboard.close();
         }
 
-        outputFileName = inputFileName.substring(0,inputFileName.lastIndexOf('.')) + ".asm";
+        outputFileName = inputFileName.substring(0, inputFileName.lastIndexOf('.')) + ".asm";
 
-        try {
-            outputFile = new PrintWriter(new FileOutputStream(outputFileName));
-        } catch (FileNotFoundException ex) {
-            System.err.println("Could not open output file " + outputFileName);
-            System.err.println("Run program again, make sure you have write permissions, etc.");
-            System.exit(0);
-        }
+
 
         // TODO: finish driver as algorithm describes
-        writeASM(inputFileName, outputFile, outputFileName);
+        writeASM(inputFileName, outputFileName);
     }
 
-    /***
+    /**
      * ALGORITHM:
-     * Create new parser with file to parse.
+     * Create new parser with file name to read from.
+     * Create new CodeWriter with file name to write to
      * While parser has more commands.
-     *  advance parser
-     *  if parser command is C_Push or C_POP
-     *      write pushPop command to output file
-     *  if parser command is C_Arithmetic
-     *      write Arithmetic command to output file
-     *
-     *  close file and update user.
+     *     advance parser
+     *     if parser command is C_Push or C_POP
+     *         write pushPop command to CodeWriter
+     *     if parser command is C_Arithmetic
+     *         write Arithmetic command to CodeWriter
+     * close file and update user.
      *
      * @param fileName
-     * @param outputFile
      * @param outputFileName
      */
-    private static void writeASM(String fileName, PrintWriter outputFile, String outputFileName)
+    private static void writeASM(String fileName, String outputFileName)
     {
         Parser parser = null;
-        CodeWriter codeWriter;
+        CodeWriter codeWriter = null;
 
         try
         {
             parser = new Parser(fileName);
 
         }
-        catch(FileNotFoundException e)
+        catch (FileNotFoundException e)
         {
             System.out.println("Unable to open file" + fileName);
             System.err.println("Run program again, check file name.");
             System.exit(0);
         }
 
-        codeWriter = new CodeWriter(outputFile);
+        try
+        {
+            codeWriter = new CodeWriter(outputFileName);
+        }
+        catch (FileNotFoundException ex)
+        {
+            System.err.println("Could not open output file " + outputFileName);
+            System.err.println("Run program again, make sure you have write permissions, etc.");
+            System.exit(0);
+        }
 
-        while(parser.hasMoreCommands())
+
+        while (parser.hasMoreCommands())
         {
             parser.advance();
 
-            if(parser.commandType() == CommandType.C_PUSH || parser.commandType() == CommandType.C_POP)
+            if (parser.commandType() == CommandType.C_PUSH || parser.commandType() == CommandType.C_POP)
             {
                 int index = Integer.parseInt(parser.arg2());
                 codeWriter.writePushPop(parser.command(), parser.arg1(), index);
             }
 
-            if(parser.commandType() == CommandType.C_ARITHMETIC)
+            if (parser.commandType() == CommandType.C_ARITHMETIC)
             {
                 codeWriter.writeArithmetic(parser.command());
             }
@@ -113,6 +117,6 @@ public class VirtualMachinePart1
 
         codeWriter.close();
 
-        System.out.println("Process complete, file was saved as " +  outputFileName);
+        System.out.println("Process complete, file was saved as " + outputFileName);
     }
 }

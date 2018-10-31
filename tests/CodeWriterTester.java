@@ -36,7 +36,7 @@ public class CodeWriterTester
 
         try
         {
-            printWriter = new PrintWriter(new FileOutputStream(fileName + ".asm"));
+            codeWriter = new CodeWriter(fileName + ".asm");
         }
         catch(FileNotFoundException e)
         {
@@ -44,7 +44,7 @@ public class CodeWriterTester
             System.exit(0);
         }
 
-        codeWriter = new CodeWriter(printWriter);
+
     }
 
     @Test

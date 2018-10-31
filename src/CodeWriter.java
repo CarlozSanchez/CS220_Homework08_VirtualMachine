@@ -4,6 +4,8 @@
 // Version 1.0
 
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.PrintWriter;
 
 
@@ -13,39 +15,32 @@ import java.io.PrintWriter;
  */
 public class CodeWriter
 {
-
-    // keep track of labelCounter variable here
-    // private final static int STATIC_START = 16;
-    //private final static int HEAP_START = 2048;
-    //private final static int LOCAL_START = 0;
-    //private final static int STACK_START = 256;
-
     // private File file;
-    private PrintWriter printWriter;
-
-    private int labelCounter;
-
     String fileName;
+    private PrintWriter printWriter;
+    private int labelCounter;
 
 
     /***
      * DESCRIPTION: Opens the output file/stream and gets ready to write into it.
      * PRECONDITION
      */
-    CodeWriter(PrintWriter outputFile)
+    CodeWriter(String fileName) throws FileNotFoundException
     {
-        this.printWriter = outputFile;
+        this.fileName = fileName;
+        this.printWriter = new PrintWriter(new FileOutputStream(fileName));
         this.labelCounter = 0;
-        // initializePointers();
     }
 
     /***
      * DESCRIPTION: Informs the code writer that the translation of a new VM file is started.
      * @param fileName The file to set
      */
-    private void setFileName(String fileName)
+    private void setFileName(String fileName) throws FileNotFoundException
     {
         this.fileName = fileName;
+        this.printWriter = new PrintWriter(new FileOutputStream(fileName));
+        this.labelCounter = 0;
     }
 
     /***
@@ -122,7 +117,6 @@ public class CodeWriter
      * POSTCONDITION: Writes to file the assembly code that will go to address
      * of top of stack. Pop off value at top of stack, store it in D. Then
      * decrement the stack pointer.
-     *
      */
     private void doublePopOperation()
     {
@@ -171,14 +165,14 @@ public class CodeWriter
         printWriter.println("M=-M");      // Pop value, negate value, push result
     }
 
-     /**
+    /**
      * DESCRIPTION: Performs an Equality operation by popping two values from stack, comparing both value then push the
-      * result(true,false) back into stack.
+     * result(true,false) back into stack.
      * PRECONDITION: none.
      * POSTCONDITION: The file will be appended with the commands for: go to SP, decrement SP address then go to new
-      * address, Pop value and Store in D, decrement current address, Conver D to negative number, update D with sum of
-      * D+M, Set M to TRUE, go to SKIP address, jump if D == 0, go to SP, go to SP address -1, Set M to FALSE. ("skip)"
-      * is written.
+     * address, Pop value and Store in D, decrement current address, Conver D to negative number, update D with sum of
+     * D+M, Set M to TRUE, go to SKIP address, jump if D == 0, go to SP, go to SP address -1, Set M to FALSE. ("skip)"
+     * is written.
      */
     private void writeEq()
     {
@@ -315,8 +309,7 @@ public class CodeWriter
         switch (command)
         {
             case "push":
-                loadD(segment, index);
-                writePushD();
+                writePush(segment, index);
                 break;
 
             case "pop":
@@ -331,56 +324,49 @@ public class CodeWriter
         printWriter.println();
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////// PUSH METHODS //////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     /**
      * DESCRIPTION: Writes to file The Operation to load D with value of segment[index].
      * PRECONDITION: none.
      * POSTCONDITION: The file will be appended with the commands for: Go to index, Store literal value in D,
+     *
      * @param segment
      * @param index
      */
-    private void loadD(String segment, int index)
+    private void writePush(String segment, int index)
     {
         switch (segment)
         {
             case "constant":
-                loadDwithAddress(index);
+                pushCONSTANT(index);
                 break;
 
             case "local":
-                loadDwithAddress(index);
-                printWriter.println("@LCL");
-                goToSegmentIndex_LoadDwithMemory();
+                pushLCL(index);
                 break;
 
             case "argument":
-                loadDwithAddress(index);
-                printWriter.println("@ARG");
-                goToSegmentIndex_LoadDwithMemory();
+                pushARG(index);
                 break;
 
             case "this":
-                loadDwithAddress(index);
-                printWriter.println("@THIS");
-                goToSegmentIndex_LoadDwithMemory();
+                pushTHIS(index);
                 break;
 
             case "that":
-                loadDwithAddress(index);
-                printWriter.println("@THAT");
-                goToSegmentIndex_LoadDwithMemory();
+                pushTHAT(index);
                 break;
 
             case "temp":
-                loadDwithAddress(index);
-                printWriter.println("@THAT");
-                printWriter.println("A=A+1");
-                goToSegmentIndex_LoadDwithMemory();
+                pushTEMP(index);
                 break;
 
             case "static":
-                printWriter.println("@" + fileName + "." + index);
-                printWriter.println("D=M");
+                pushSTATIC(index);
                 break;
 
             default:
@@ -389,11 +375,68 @@ public class CodeWriter
         }
     }
 
+    private void pushCONSTANT(int index)
+    {
+        loadD(index);                           // @ + index, D=A
+        pushDintoStack();                       // @SP, M=M+1, A=M-1, M=D
+    }
+
+    private void pushLCL(int index)
+    {
+        loadD(index);                           // @+index, D=A
+        printWriter.println("@LCL");            // @LCL
+        dereferenceSegment();                   // A=M+D, D=M
+        pushDintoStack();                       // @SP, M=M+1, A=M-1, M=D
+    }
+
+    private void pushARG(int index)
+    {
+        loadD(index);                           // @ + index, D=A
+        printWriter.println("@ARG");            // @ARG
+        dereferenceSegment();                   // A=M+D, D=M
+        pushDintoStack();                       // @SP, M=M+1, A=M-1, M=D
+    }
+
+    private void pushTHIS(int index)
+    {
+        loadD(index);                           // @ + index, D=A
+        printWriter.println("@THIS");           // @THIS
+        dereferenceSegment();                   // A=M+D, D=M
+        pushDintoStack();                       // @SP, M=M+1, A=M-1, M=D
+    }
+
+    private void pushTHAT(int index)
+    {
+        loadD(index);                           // @ + index, D=A
+        printWriter.println("@THAT");           // @THAT
+        dereferenceSegment();                   // A=M+D, D=M
+        pushDintoStack();                       // @SP, M=M+1, A=M-1, M=D
+    }
+
+    private void pushTEMP(int index)
+    {
+        loadD(index);                           // @ + index, D=A
+        printWriter.println("@THAT");           // @THAT
+        printWriter.println("A=A+1");           // A=A+1
+        printWriter.println("A=A+D");
+        printWriter.println("D=M");
+        pushDintoStack();                       // @SP, M=M+1, A=M-1, M=D
+    }
+
+    private void pushSTATIC(int index)
+    {
+        String temp = "@" + fileName + "." + index;
+        printWriter.println(temp);              // @Codewriter.i
+        printWriter.println("D=M");             // D=M
+        pushDintoStack();                       // @SP, M=M+1, A=M-1, M=D
+    }
+
     /**
-     * DESCRIPTION: helper method used by loadDfromStack().
+     * DESCRIPTION: helper method used by push"Segment" methods to load a value into D.
+     *
      * @param address
      */
-    private void loadDwithAddress(int address)
+    private void loadD(int address)
     {
         printWriter.println("@" + address);
         printWriter.println("D=A");
@@ -402,9 +445,9 @@ public class CodeWriter
     /**
      * DESCRIPTION: helper method used by loadDfromStack().
      */
-    private void goToSegmentIndex_LoadDwithMemory()
+    private void dereferenceSegment()
     {
-        printWriter.println("A=A+D");
+        printWriter.println("A=M+D");
         printWriter.println("D=M");
     }
 
@@ -414,7 +457,7 @@ public class CodeWriter
      * POSTCONDITION: The file will be appended with the commands for: go to SP, increment SP address, go to SP address -1 ,
      * update M withe value in D.
      */
-    private void writePushD()
+    private void pushDintoStack()
     {
         // increment SP address
         printWriter.println("@SP");
@@ -425,42 +468,19 @@ public class CodeWriter
         printWriter.println("M=D");
     }
 
-    /**
-     * DESCRIPTION: Writes the steps for Popping a value from the stack to the desired segment[index].
-     * PRECONDITION:
-     * POSTCONDITION:
-     * @param segment
-     * @param index
-     */
-    private void writePop(String segment, int index)
-    {
-
-        printWriter.println("@" + index);   // @index
-        printWriter.println("D=A");         // store index as value in D
-
-        writeAtSegement(segment, index);    // @segment EX. @THAT, @THIS, @LCL
-        printWriter.println("D=D+M");       // D =  segment[i]
-
-        printWriter.println("@R13");        // Go to temp R13
-        printWriter.println("M=D");         // Store destination address
-
-        printWriter.println("@SP");         // go to Stack Pointer
-        printWriter.println("AM=M-1");      // decrement SP, go to new Top of Stack address
-        printWriter.println("D=M");         //  Pop M to D
-
-        printWriter.println("@R13");        // Go to tempR13
-        printWriter.println("A=M");         // go to segment[i]
-        printWriter.println("M=D");         // Store the value of D into memory, segment[i] = D
-    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////// POP METHODS //////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * DESCRIPTION:
      * PRECONDITION:
      * POSTCONDITION:
+     *
      * @param segment
      * @param index
      */
-    private void writeAtSegement(String segment, int index)
+    private void writePop(String segment, int index)
     {
         switch (segment)
         {
@@ -469,32 +489,27 @@ public class CodeWriter
                 break;
 
             case "local":
-                printWriter.println("@LCL");
+                popLCL(index);
                 break;
 
             case "argument":
-                printWriter.println("@ARG");
+                popARG(index);
                 break;
 
             case "this":
-                printWriter.println("@THIS");
+                popTHIS(index);
                 break;
 
             case "that":
-                printWriter.println("@THAT");
+                popTHAT(index);
                 break;
 
             case "temp":
-                //printWriter.println("@TEMP");
-                printWriter.println("@THAT");
-                printWriter.println("A=A+1");
+                popTEMP(index);
                 break;
 
             case "static":
-                // Load D from static segment
-                // printWriter.println("@")
-                printWriter.println("@" + fileName + "." + index);
-
+                popSTATIC(index);
                 break;
 
             default:
@@ -503,8 +518,94 @@ public class CodeWriter
         }
     }
 
+    private void popLCL(int index)
+    {
+        loadDwith(index);                       // @ + index, D=A
+
+        printWriter.println("@LCL");
+        printWriter.println("D=D+M");           // D = address of LCL[i]
+
+        storeDestinationAddressInTemp();        // @R13, M = D
+        popValueToDestinationAddress();         // @SP, AM=M-1, D=M, @R13, A=M, M=D
+    }
+
+    private void popARG(int index)
+    {
+        loadDwith(index);                       // @ + index, D=A
+
+        printWriter.println("@ARG");
+        printWriter.println("D=D+M");           // D = address of ARG[i]
+
+        storeDestinationAddressInTemp();        // @R13, M = D
+        popValueToDestinationAddress();         // @SP, AM=M-1, D=M, @R13, A=M, M=D
+    }
+
+    private void popTHIS(int index)
+    {
+        loadDwith(index);                       // @ + index, D=A
+
+        printWriter.println("@THIS");
+        printWriter.println("D=D+M");           // D = address of THIS[i]
+
+        storeDestinationAddressInTemp();        // @R13, M = D
+        popValueToDestinationAddress();         // @SP, AM=M-1, D=M, @R13, A=M, M=D
+    }
+
+    private void popTHAT(int index)
+    {
+        loadDwith(index);                       // @ + index, D=A
+
+        printWriter.println("@THAT");
+        printWriter.println("D=D+M");           // D = address of THAT[i]
+
+        storeDestinationAddressInTemp();        // @R13, M = D
+        popValueToDestinationAddress();         // @SP, AM=M-1, D=M, @R13, A=M, M=D
+    }
+
+    private void popTEMP(int index)
+    {
+        loadDwith(index);                       // @ + index, D=A
+
+        printWriter.println("@THAT");           // go to @THAT
+        printWriter.println("A=A+1");           // now go to @TEMP
+        printWriter.println("D=D+A");           // D = address of TEMP[i]
+
+        storeDestinationAddressInTemp();        // @R13, M = D
+        popValueToDestinationAddress();         // @SP, AM=M-1, D=M, @R13, A=M, M=D
+    }
+
+    private void popSTATIC(int index)
+    {
+        printWriter.println("@SP");         // go to Stack Pointer
+        printWriter.println("AM=M-1");      // decrement SP, go to new Top of Stack address
+        printWriter.println("D=M");         //  Pop M to D
+        printWriter.println("@" + fileName + "." + index);
+        printWriter.println("M=D");
+    }
 
 
+    private void loadDwith(int index)
+    {
+        printWriter.println("@" + index);   // @index
+        printWriter.println("D=A");         // store index as value in D
+    }
+
+    private void storeDestinationAddressInTemp()
+    {
+        printWriter.println("@R13");        // Go to temp R13
+        printWriter.println("M=D");         // Store destination address
+    }
+
+    private void popValueToDestinationAddress()
+    {
+        printWriter.println("@SP");         // go to Stack Pointer
+        printWriter.println("AM=M-1");      // decrement SP, go to new Top of Stack address
+        printWriter.println("D=M");         //  Pop M to D
+
+        printWriter.println("@R13");        // Go to tempR13
+        printWriter.println("A=M");         // go to segment[i]
+        printWriter.println("M=D");         // Store the value of D into memory, segment[i] = D
+    }
 
 
     /***
