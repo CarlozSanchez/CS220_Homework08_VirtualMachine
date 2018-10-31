@@ -107,7 +107,7 @@ public class CodeWriter
     }
 
     /**
-     * DESCRIPTION: Performs the first steps of a single pop operation by going to the top of stack.
+     * DESCRIPTION: Writes the first steps of a single pop operation by going to the top of stack.
      * PRECONDITION: none.
      * POSTCONDITION: Writes to file the assembly code for A-register to hold top of stack address.
      */
@@ -118,7 +118,7 @@ public class CodeWriter
     }
 
     /**
-     * DESCRIPTION: Performs the first steps of a double pop operation by going to SP, decrement SP address and go to
+     * DESCRIPTION: Writes the first steps of a double pop operation by going to SP, decrement SP address and go to
      * new SP address, Store contents of 1st Pop value into D, go to location of 2nd value to be popped.
      * PRECONDITION: none.
      * POSTCONDITION: Writes to file the assembly code that will go to address
@@ -134,7 +134,7 @@ public class CodeWriter
     }
 
     /**
-     * DESCRIPTION: Performs an Addition command by popping 2 values from stack, adding them, then pushing result into stack.
+     * DESCRIPTION: Writes an Addition command by popping 2 values from stack, adding them, then pushing result into stack.
      * PRECONDITION: none
      * POSTCONDITION: The file will be appended with the commands for:  go to SP, decrement SP address then go to new
      * address, Pop value and Store in D, decrement current address, update M with sum of D + M
@@ -147,7 +147,7 @@ public class CodeWriter
 
 
     /**
-     * DESCRIPTION: Performs an Subtraction command by popping 2 values from stack, then subtracts the first popped value
+     * DESCRIPTION: Writes an Subtraction command by popping 2 values from stack, then subtracts the first popped value
      * from the second popped value, finally the result is pushed back into stack.
      * PRECONDITION: none
      * POSTCONDITION: The file will be appended with the commands for: go to SP, decrement SP address then go to new
@@ -160,7 +160,7 @@ public class CodeWriter
     }
 
     /**
-     * DESCRIPTION: Performs a Negation command by popping a single value from stack, then performs a bit wise negation
+     * DESCRIPTION: Writes a Negation command by popping a single value from stack, then writes a bit wise negation
      * on the value, finally the result is pushed into stack.
      * PRECONDITION: none.
      * POSTCONDITION: The file will be appended with the commands for: go to SP, go to SP address - 1, update M
@@ -173,7 +173,7 @@ public class CodeWriter
     }
 
     /**
-     * DESCRIPTION: Performs an Equality operation by popping two values from stack, comparing both value then push the
+     * DESCRIPTION: Writes an Equality operation by popping two values from stack, comparing both value then push the
      * result(true,false) back into stack.
      * PRECONDITION: none.
      * POSTCONDITION: The file will be appended with the commands for: go to SP, decrement SP address then go to new
@@ -203,7 +203,7 @@ public class CodeWriter
     }
 
     /**
-     * DESCRIPTION: Performs a Greater then operation by popping two values from stack, comparing first value bigger then
+     * DESCRIPTION: Writes a Greater then operation by popping two values from stack, comparing first value bigger then
      * second value, then storing the result(true,false) in stack.
      * PRECONDITION: none.
      * POSTCONDITION: The file will be appended with the commands for: go to SP, decrement SP address then go to new
@@ -220,7 +220,7 @@ public class CodeWriter
     }
 
     /**
-     * DESCRIPTION: Performs a Less then operation by popping two values from stack, comparing second  value bigger then
+     * DESCRIPTION: Writes a Less then operation by popping two values from stack, comparing second  value bigger then
      * first value, then storing the result(true,false) in stack.
      * PRECONDITION:
      * POSTCONDITION: The file will be appended with the commands for: go to SP, decrement SP address then go to new
@@ -237,7 +237,7 @@ public class CodeWriter
     }
 
     /**
-     * DESCRIPTION: Performs the rest of a less then or greater then operation by pushing into stack the result(true,false)
+     * DESCRIPTION: Writes the rest of a less then or greater then operation by pushing into stack the result(true,false)
      * of a previous LT or GT comparison.
      * PRECONDITION: writeLT() or writeGt() should invoke this method to finish the last steps of it operation.
      * POSTCONDITION: The file will be appended with the commands for: Set M to TRUE, go to SKIP address, jump if D < 0,
@@ -260,7 +260,7 @@ public class CodeWriter
     }
 
     /**
-     * DESCRIPTION: Performs an AND operation by popping two values from stack, performing an bit wise AND operation on
+     * DESCRIPTION: Writes an AND operation by popping two values from stack, performing an bit wise AND operation on
      * both values, then pushing the results back into stack.
      * PRECONDITION: none.
      * POSTCONDITION: The file will be appended with the commands for:  go to SP, decrement SP address then go to new
@@ -273,7 +273,7 @@ public class CodeWriter
     }
 
     /**
-     * DESCRIPTION: Performs an OR operation by popping two values from stack, performing a bit wise OR operation on
+     * DESCRIPTION: Writes an OR operation by popping two values from stack, performing a bit wise OR operation on
      * both values, then pushing the result back into stack.
      * PRECONDITION: none.
      * POSTCONDITION: The file will be appended with the commands for:  go to SP, decrement SP address then go to new
@@ -287,7 +287,7 @@ public class CodeWriter
     }
 
     /**
-     * DESCRIPTION: Performs a NOT operation by popping two values from stack, performing a bit wise NOT operation on
+     * DESCRIPTION: Writes a NOT operation by popping two values from stack, performing a bit wise NOT operation on
      * both values, then pushing the result back into stack.
      * PRECONDITION: none.
      * POSTCONDITION: The file will be appended with the commands for: go to SP, go to SP address - 1, update M
@@ -337,12 +337,14 @@ public class CodeWriter
 
 
     /**
-     * DESCRIPTION: Writes to file The Operation to load D with value of segment[index].
-     * PRECONDITION: none.
-     * POSTCONDITION: The file will be appended with the commands for: Go to index, Store literal value in D,
+     * DESCRIPTION: Writes the assembly instructions for "push segment i", where segment is the memory segment to push
+     * into, and i represents the specific index of said segment to push into.
+     * PRECONDITION: segment must be one of the following commands: "constant", "local", "argument", "this", "that",
+     * "temp", "static".
+     * POSTCONDITION: The file will be appended with the commands for: Go to segment index, Store literal value in D,
      *
-     * @param segment
-     * @param index
+     * @param segment The part of memory to access.
+     * @param index The specific index in memory segment to access.
      */
     private void writePush(String segment, int index)
     {
@@ -382,12 +384,26 @@ public class CodeWriter
         }
     }
 
+    /**
+     * DESCRIPTION: Writes the assembly commands for pushing a "costant" value into stack.
+     * PRECONDITION: index is a none negative number within memory range(0-max)
+     * POSTCONDTION: The file will be appended with the commands: @+index, D=A,
+     * @SP, M=M+1, A=M-1, M=D
+     * @param index the index of memory segment CONSTANT we want to push from.
+     */
     private void pushCONSTANT(int index)
     {
         loadD(index);                           // @ + index, D=A
         pushDintoStack();                       // @SP, M=M+1, A=M-1, M=D
     }
 
+    /**
+     * DESCRIPTION: Writes the assembly commands for pushing a "local" value into stack.
+     * PRECONDITION: index is a none negative number within memory range(0-max)
+     * POSTCONDTION: The file will be appended with the commands: @+index, D=A,
+     * @LCL, A=M+D, D=M, @SP, M=M+1, A=M-1, M=D
+     * @param index the index of memory segment LCL we want to push from.
+     */
     private void pushLCL(int index)
     {
         loadD(index);                           // @+index, D=A
@@ -396,6 +412,13 @@ public class CodeWriter
         pushDintoStack();                       // @SP, M=M+1, A=M-1, M=D
     }
 
+    /**
+     * DESCRIPTION: Writes the assembly commands for pushing an "argument" value into stack.
+     * PRECONDITION: index is a none negative number within memory range(0-max)
+     * POSTCONDTION: The file will be appended with the commands: @+index, D=A,
+     * @ARG, A=M+D, D=M, @SP, M=M+1, A=M-1, M=D
+     * @param index the index of memory segment ARG we want to push from.
+     */
     private void pushARG(int index)
     {
         loadD(index);                           // @ + index, D=A
@@ -404,6 +427,13 @@ public class CodeWriter
         pushDintoStack();                       // @SP, M=M+1, A=M-1, M=D
     }
 
+    /**
+     * DESCRIPTION: Writes the assembly commands for pushing a "this" value into stack.
+     * PRECONDITION: index is a none negative number within memory range(0-max)
+     * POSTCONDTION: The file will be appended with the commands: @+index, D=A,
+     * @THIS, A=M+D, D=M, @SP, M=M+1, A=M-1, M=D
+     * @param index the index of memory segment THIS we want to push from.
+     */
     private void pushTHIS(int index)
     {
         loadD(index);                           // @ + index, D=A
@@ -412,6 +442,13 @@ public class CodeWriter
         pushDintoStack();                       // @SP, M=M+1, A=M-1, M=D
     }
 
+    /**
+     * DESCRIPTION: Writes the assembly commands for pushing a "that" value into stack.
+     * PRECONDITION: index is a none negative number within memory range(0-max)
+     * POSTCONDTION: The file will be appended with the commands: @+index, D=A,
+     * @THAT, A=M+D, D=M, @SP, M=M+1, A=M-1, M=D
+     * @param index the index of memory segment THAT we want to push from.
+     */
     private void pushTHAT(int index)
     {
         loadD(index);                           // @ + index, D=A
@@ -420,16 +457,30 @@ public class CodeWriter
         pushDintoStack();                       // @SP, M=M+1, A=M-1, M=D
     }
 
+    /**
+     * DESCRIPTION: Writes the assembly commands for pushing a "temp" value into stack.
+     * PRECONDITION: index is a none negative number within memory range(0-max)
+     * POSTCONDTION: The file will be appended with the commands: @+index, D=A,
+     * @THAT, A=A+1, A=A+D, D=M, @SP, M=M+1, A=M-1, M=D
+     * @param index the index of memory segment TEMP we want to push from.
+     */
     private void pushTEMP(int index)
     {
         loadD(index);                           // @ + index, D=A
         printWriter.println("@THAT");           // @THAT
         printWriter.println("A=A+1");           // A=A+1
-        printWriter.println("A=A+D");
-        printWriter.println("D=M");
+        printWriter.println("A=A+D");           // A=A+D
+        printWriter.println("D=M");             // D=M
         pushDintoStack();                       // @SP, M=M+1, A=M-1, M=D
     }
 
+    /**
+     * DESCRIPTION: Writes the assembly commands for pushing a "static" value into stack.
+     * PRECONDITION: index is a none negative number within memory range(0-max)
+     * POSTCONDTION: The file will be appended with the commands: @Codewriter.i,
+     * D=M, @SP, M=M+1, A=M-1, M=D
+     * @param index the index of memory segment STATIC we want to push from.
+     */
     private void pushSTATIC(int index)
     {
         String temp = "@" + fileName + "." + index;
@@ -441,8 +492,8 @@ public class CodeWriter
 
     /**
      * DESCRIPTION: helper method used by push"Segment" methods to load a value into D.
-     *
-     * @param address
+     * POSTCONDTION: The file will be appended with the commands: @address, D=A
+     * @param address The value to assign D to.
      */
     private void loadD(int address)
     {
@@ -452,6 +503,7 @@ public class CodeWriter
 
     /**
      * DESCRIPTION: helper method used by loadDfromStack().
+     * POSTCONDTION: The file will be appended with the commands: A=M+D, D=M
      */
     private void dereferenceSegment()
     {
@@ -530,7 +582,7 @@ public class CodeWriter
     {
         loadDwith(index);                       // @ + index, D=A
 
-        printWriter.println("@LCL");
+        printWriter.println("@LCL");            // @LCL
         printWriter.println("D=D+M");           // D = address of LCL[i]
 
         storeDestinationAddressInTemp();        // @R13, M = D
@@ -541,7 +593,7 @@ public class CodeWriter
     {
         loadDwith(index);                       // @ + index, D=A
 
-        printWriter.println("@ARG");
+        printWriter.println("@ARG");            //@ARG
         printWriter.println("D=D+M");           // D = address of ARG[i]
 
         storeDestinationAddressInTemp();        // @R13, M = D
@@ -552,7 +604,7 @@ public class CodeWriter
     {
         loadDwith(index);                       // @ + index, D=A
 
-        printWriter.println("@THIS");
+        printWriter.println("@THIS");           // @THIS
         printWriter.println("D=D+M");           // D = address of THIS[i]
 
         storeDestinationAddressInTemp();        // @R13, M = D
@@ -563,7 +615,7 @@ public class CodeWriter
     {
         loadDwith(index);                       // @ + index, D=A
 
-        printWriter.println("@THAT");
+        printWriter.println("@THAT");           // @THAT
         printWriter.println("D=D+M");           // D = address of THAT[i]
 
         storeDestinationAddressInTemp();        // @R13, M = D
@@ -584,11 +636,13 @@ public class CodeWriter
 
     private void popSTATIC(int index)
     {
-        printWriter.println("@SP");         // go to Stack Pointer
-        printWriter.println("AM=M-1");      // decrement SP, go to new Top of Stack address
-        printWriter.println("D=M");         //  Pop M to D
-        printWriter.println("@" + fileName + "." + index);
-        printWriter.println("M=D");
+        String str = "@" + fileName + "." + index;
+
+        printWriter.println("@SP");             // go to Stack Pointer
+        printWriter.println("AM=M-1");          // decrement SP, go to new Top of Stack address
+        printWriter.println("D=M");             //  Pop M to D
+        printWriter.println(str);               // @filename.i
+        printWriter.println("M=D");             // M=D
     }
 
 
