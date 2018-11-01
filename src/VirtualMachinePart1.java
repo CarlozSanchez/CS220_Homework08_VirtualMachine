@@ -1,3 +1,4 @@
+// FileName: VirtualMachinePart1.java
 // Programer: Carlos Sanchez
 // Class: CS220 MW 3:30pm - 5:20pm
 // Lst Update: 10/31/2018
@@ -5,10 +6,13 @@
 
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.util.Scanner;
+
+/**
+ * VirutalMachinePart1.java - This program converts a Virtual Machine file to an Assembly file by parsing each line of
+ * commands from a virtual machine file(.vm), then translating each line into it's equivalent Assembly(.asm) instructions
+ * in a seperate file.
+ */
 
 public class VirtualMachinePart1
 {
@@ -19,10 +23,6 @@ public class VirtualMachinePart1
     public static void main(String[] args)
     {
         String inputFileName, outputFileName;
-        PrintWriter outputFile = null; //keep compiler happy
-
-        //SymbolTable symbolTable;
-        int romAddress, ramAddress;
 
         //get input file name from command line or console input
         if (args.length == 1)
@@ -43,10 +43,8 @@ public class VirtualMachinePart1
 
         outputFileName = inputFileName.substring(0, inputFileName.lastIndexOf('.')) + ".asm";
 
-
-
         // TODO: finish driver as algorithm describes
-        parse(inputFileName, outputFileName);
+        parseVM(inputFileName, outputFileName);
     }
 
     /**
@@ -64,7 +62,7 @@ public class VirtualMachinePart1
      * @param fileName
      * @param outputFileName
      */
-    private static void parse(String fileName, String outputFileName)
+    private static void parseVM(String fileName, String outputFileName)
     {
         Parser parser = null;
         CodeWriter codeWriter = null;

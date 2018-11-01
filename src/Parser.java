@@ -1,8 +1,13 @@
+// FileName: Parser.java
 // Programer: Carlos Sanchez
 // Class: CS220 MW 3:30pm - 5:20pm
 // Lst Update: 10/31/2018
 // Version 1.0
 
+/**
+ * Parser.java - Is used to parse the contents of a .vm file into corresponding data fields. Each line is parsed using
+ * advace() to desiminate each line into it's corresponding section in the format: Command Argument1 Argument2.
+ */
 
 import java.io.File;
 import java.io.FileNotFoundException;

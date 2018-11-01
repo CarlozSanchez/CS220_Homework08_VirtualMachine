@@ -1,3 +1,4 @@
+// FileName: CodeWriter.java
 // Programer: Carlos Sanchez
 // Class: CS220 MW 3:30pm - 5:20pm
 // Lst Update: 10/31/2018
@@ -10,8 +11,9 @@ import java.io.PrintWriter;
 
 
 /**
- * CodeWriter.java - This writes the appropriate Arithmetic or Push/Push operation
- * to destination file.
+ * CodeWriter.java - This writes the appropriate Arithmetic or Push/Push operation to destination file. The commands
+ * fall into 2 categories of an Arithmetic commands that consist on a single phrase (ex. add, not, eql) or a PushPop
+ * commands that consists of 3 arguments ex(push constant 4, pop static 25).
  */
 public class CodeWriter
 {
@@ -335,7 +337,6 @@ public class CodeWriter
     //////////////////////////////////////////// PUSH METHODS //////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
     /**
      * DESCRIPTION: Writes the assembly instructions for "push segment i", where segment is the memory segment to push
      * into, and i represents the specific index of said segment to push into.
@@ -344,7 +345,7 @@ public class CodeWriter
      * POSTCONDITION: The file will be appended with the commands for: Go to segment index, Store literal value in D,
      *
      * @param segment The segment of memory to access.
-     * @param index The specific index in memory segment to access.
+     * @param index   The specific index in memory segment to access.
      */
     private void writePush(String segment, int index)
     {
@@ -378,6 +379,10 @@ public class CodeWriter
                 pushSTATIC(index);
                 break;
 
+            case "pointer":
+                pushPOINTER(index);
+                break;
+
             default:
                 System.out.println("unknown segment \"" + segment + "\" in loadDfromStack");
                 break;
@@ -388,8 +393,9 @@ public class CodeWriter
      * DESCRIPTION: Writes the assembly commands for pushing a "costant" value into stack.
      * PRECONDITION: index is a none negative number within memory range(0-max)
      * POSTCONDTION: The file will be appended with the commands: @+index, D=A,
-     * @SP, M=M+1, A=M-1, M=D
+     *
      * @param index the index of memory segment CONSTANT we want to push from.
+     * @SP, M=M+1, A=M-1, M=D
      */
     private void pushCONSTANT(int index)
     {
@@ -401,8 +407,9 @@ public class CodeWriter
      * DESCRIPTION: Writes the assembly commands for pushing a "local" value into stack.
      * PRECONDITION: index is a none negative number within memory range(0-max)
      * POSTCONDTION: The file will be appended with the commands: @+index, D=A,
-     * @LCL, A=M+D, D=M, @SP, M=M+1, A=M-1, M=D
+     *
      * @param index the index of memory segment LCL we want to push from.
+     * @LCL, A=M+D, D=M, @SP, M=M+1, A=M-1, M=D
      */
     private void pushLCL(int index)
     {
@@ -416,8 +423,9 @@ public class CodeWriter
      * DESCRIPTION: Writes the assembly commands for pushing an "argument" value into stack.
      * PRECONDITION: index is a none negative number within memory range(0-max)
      * POSTCONDTION: The file will be appended with the commands: @+index, D=A,
-     * @ARG, A=M+D, D=M, @SP, M=M+1, A=M-1, M=D
+     *
      * @param index the index of memory segment ARG we want to push from.
+     * @ARG, A=M+D, D=M, @SP, M=M+1, A=M-1, M=D
      */
     private void pushARG(int index)
     {
@@ -431,8 +439,9 @@ public class CodeWriter
      * DESCRIPTION: Writes the assembly commands for pushing a "this" value into stack.
      * PRECONDITION: index is a none negative number within memory range(0-max)
      * POSTCONDTION: The file will be appended with the commands: @+index, D=A,
-     * @THIS, A=M+D, D=M, @SP, M=M+1, A=M-1, M=D
+     *
      * @param index the index of memory segment THIS we want to push from.
+     * @THIS, A=M+D, D=M, @SP, M=M+1, A=M-1, M=D
      */
     private void pushTHIS(int index)
     {
@@ -446,8 +455,9 @@ public class CodeWriter
      * DESCRIPTION: Writes the assembly commands for pushing a "that" value into stack.
      * PRECONDITION: index is a none negative number within memory range(0-max)
      * POSTCONDTION: The file will be appended with the commands: @+index, D=A,
-     * @THAT, A=M+D, D=M, @SP, M=M+1, A=M-1, M=D
+     *
      * @param index the index of memory segment THAT we want to push from.
+     * @THAT, A=M+D, D=M, @SP, M=M+1, A=M-1, M=D
      */
     private void pushTHAT(int index)
     {
@@ -461,8 +471,9 @@ public class CodeWriter
      * DESCRIPTION: Writes the assembly commands for pushing a "temp" value into stack.
      * PRECONDITION: index is a none negative number within memory range(0-max)
      * POSTCONDTION: The file will be appended with the commands: @+index, D=A,
-     * @THAT, A=A+1, A=A+D, D=M, @SP, M=M+1, A=M-1, M=D
+     *
      * @param index the index of memory segment TEMP we want to push from.
+     * @THAT, A=A+1, A=A+D, D=M, @SP, M=M+1, A=M-1, M=D
      */
     private void pushTEMP(int index)
     {
@@ -479,6 +490,7 @@ public class CodeWriter
      * PRECONDITION: index is a none negative number within memory range(0-max)
      * POSTCONDTION: The file will be appended with the commands: @Codewriter.i,
      * D=M, @SP, M=M+1, A=M-1, M=D
+     *
      * @param index the index of memory segment STATIC we want to push from.
      */
     private void pushSTATIC(int index)
@@ -491,8 +503,27 @@ public class CodeWriter
     }
 
     /**
+     * DESCRIPTION: Writes the assembly commands for pushing a "pointer" value into stack.
+     * PRECONDITION: index is a none negative number within memory range(0-max)
+     * POSTCONDTION: The file will be appended with the commands: @+index, D=A, @THIS, A=A+D, D=M, @SP, M=M+1, A=M-1, M=D
+     *
+     * @param index the index of memory segment POINTER we want to push from.
+     */
+    private void pushPOINTER(int index)
+    {
+        loadD(index);                           // @+index, D=A
+        printWriter.println("@3");              // @THIS
+        printWriter.println("A=A+D");           // A=A+D
+        printWriter.println("D=M");             // D=M
+        pushDintoStack();                       // @SP, M=M+1, A=M-1, M=D
+    }
+
+    ///////////////////////////////////////// PUSH HELPER METHODS //////////////////////////////////////////////////////
+
+    /**
      * DESCRIPTION: helper method used by push"Segment" methods to load a value into D.
      * POSTCONDTION: The file will be appended with the commands: @address, D=A
+     *
      * @param address The value to assign D to.
      */
     private void loadD(int address)
@@ -531,7 +562,7 @@ public class CodeWriter
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////// POP METHODS //////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
+
 
     /** pointer implementation
      * push pointer 0, this
@@ -540,8 +571,6 @@ public class CodeWriter
 
 
     /**
-
-     *
      * DESCRIPTION: Writes the assembly instructions for "pop segment i", where segment i is the memory segment to pop
      * to, and i represents the specific index of said segment to pop to.
      * PRECONDITION: segment must be one of the following commands: "constant", "local", "argument", "this", "that",
@@ -549,7 +578,7 @@ public class CodeWriter
      * POSTCONDITION: The file will be appended with the commands for: Pop top most value of stack into segmente i.
      *
      * @param segment The segment of memory to access.
-     * @param index The specific index in memory segment to access.
+     * @param index   The specific index in memory segment to access.
      */
     private void writePop(String segment, int index)
     {
@@ -583,18 +612,24 @@ public class CodeWriter
                 popSTATIC(index);
                 break;
 
+            case "pointer":
+                popPOINTER(index);
+                break;
+
             default:
                 System.out.println("unknown segment \"" + segment + "\" in loadDfromStack");
                 break;
         }
     }
 
+
     /**
-     * DESCRIPTION:
-     * PRECONDITION:
-     * POSTCONDITION:
+     * DESCRIPTION: Pops values from stack into LCL[index].
+     * PRECONDITION: none.
+     * POSTCONDITION:   Writes to file the assembly code for: @+index, D=a, @LCL, D=D+M, @R13, M=D, @SP, AM=M-1, D=m,
      *
-     * @param index
+     * @param index The LCL[index] to pop value too.
+     * @R13, A=M, M=D
      */
     private void popLCL(int index)
     {
@@ -607,6 +642,14 @@ public class CodeWriter
         popValueToDestinationAddress();         // @SP, AM=M-1, D=M, @R13, A=M, M=D
     }
 
+    /**
+     * DESCRIPTION: Pops values from stack into ARG[index].
+     * PRECONDITION: none.
+     * POSTCONDITION:   Writes to file the assembly code for: @+index, D=A, @ARG, D=D+M, @R13, M=D, @SP, AM=M-1, D=m,
+     *
+     * @param index The ARG[index] to pop value too.
+     * @R13, A=M, M=D
+     */
     private void popARG(int index)
     {
         loadDwith(index);                       // @ + index, D=A
@@ -618,6 +661,14 @@ public class CodeWriter
         popValueToDestinationAddress();         // @SP, AM=M-1, D=M, @R13, A=M, M=D
     }
 
+    /**
+     * DESCRIPTION: Pops values from stack into THIS[index].
+     * PRECONDITION: none.
+     * POSTCONDITION:   Writes to file the assembly code for: @+index, D=A, @THIS, D=D+M, @R13, M=D, @SP, AM=M-1, D=m,
+     *
+     * @param index The THIS[index] to pop value too.
+     * @R13, A=M, M=D
+     */
     private void popTHIS(int index)
     {
         loadDwith(index);                       // @ + index, D=A
@@ -629,6 +680,14 @@ public class CodeWriter
         popValueToDestinationAddress();         // @SP, AM=M-1, D=M, @R13, A=M, M=D
     }
 
+    /**
+     * DESCRIPTION: Pops values from stack into THAT[index].
+     * PRECONDITION: none.
+     * POSTCONDITION:   Writes to file the assembly code for: @+index, D=A, @THAT, D=D+M, @R13, M=D, @SP, AM=M-1, D=m,
+     *
+     * @param index The THAT[index] to pop value too.
+     * @R13, A=M, M=D
+     */
     private void popTHAT(int index)
     {
         loadDwith(index);                       // @ + index, D=A
@@ -640,18 +699,33 @@ public class CodeWriter
         popValueToDestinationAddress();         // @SP, AM=M-1, D=M, @R13, A=M, M=D
     }
 
+    /**
+     * DESCRIPTION: Pops values from stack into TEMP[index].
+     * PRECONDITION: none.
+     * POSTCONDITION: Writes to file the assembly code for: @+index, D=A, @THAT, A=A+1, D=D+M, @R13, M=D, @SP, AM=M-1, D=m,
+     *
+     * @param index The THAT[index] to pop value too.
+     * @R13, A=M, M=D
+     */
     private void popTEMP(int index)
     {
         loadDwith(index);                       // @ + index, D=A
 
-        printWriter.println("@THAT");           // go to @THAT
-        printWriter.println("A=A+1");           // now go to @TEMP
-        printWriter.println("D=D+A");           // D = address of TEMP[i]
+        printWriter.println("@THAT");           // @THAT
+        printWriter.println("A=A+1");           // A=A+1
+        printWriter.println("D=D+A");           // D=D+A
 
         storeDestinationAddressInTemp();        // @R13, M = D
         popValueToDestinationAddress();         // @SP, AM=M-1, D=M, @R13, A=M, M=D
     }
 
+    /**
+     * DESCRIPTION:Pops values from stack into STATIC[index].
+     * PRECONDITION: none.
+     * POSTCONDITION: Writes to file the assembly code for: @SP, AM=M=1, D=M, @CodeWriter.i, M=D
+     *
+     * @param index The STATIC[index] to pop value too.
+     */
     private void popSTATIC(int index)
     {
         String str = "@" + fileName + "." + index;
@@ -663,19 +737,56 @@ public class CodeWriter
         printWriter.println("M=D");             // M=D
     }
 
-
-    private void loadDwith(int index)
+    /**
+     * DESCRIPTION: Pops values from stack into POINTER[index].
+     * PRECONDITION: none.
+     * POSTCONDITION: Writes to file the assembly code for: @+index, D=A, @3, D=D+A, @R13, M=D, @SP, AM=M-1, D=m,
+     *
+     * @param index The POINTER[index] to pop value too.
+     */
+    private void popPOINTER(int index)
     {
-        printWriter.println("@" + index);   // @index
+        loadDwith(index);                       // @ + index, D=A
+
+        printWriter.println("@3");              // @This
+        printWriter.println("D=D+A");           // D=D+A
+
+        storeDestinationAddressInTemp();        // @R13, M = D
+        popValueToDestinationAddress();         // @SP, AM=M-1, D=M, @R13, A=M, M=D
+    }
+
+    /////////////////////////////////////////// POP HELPER METHODS /////////////////////////////////////////////////////
+    /**
+     * DESCRIPTION: Helper Method used by pop methods to write the assembly commands for loading D with a literal value.
+     * PRECONDITION: None.
+     * POSTCONDITION: Writes to file the assembly code for: @+index, D=A.
+     *
+     * @param value The value to load D with
+     */
+    private void loadDwith(int value)
+    {
+        printWriter.println("@" + value);   // @index
         printWriter.println("D=A");         // store index as value in D
     }
 
+
+    /**
+     * DESCRIPTION: Helper Method used by pop methods to write the assembly commands for storing the value in D to R13.
+     * PRECONDITION: None.
+     * POSTCONDITION: Writes to file the assembly code for: @R13, M=D
+     */
     private void storeDestinationAddressInTemp()
     {
         printWriter.println("@R13");        // Go to temp R13
         printWriter.println("M=D");         // Store destination address
     }
 
+    /**
+     * DESCRIPTION: Helper Method used by pop methods to write the assembly commands for poping top most value in stack
+     * to the destination address stored in R13.
+     * PRECONDITION: None.
+     * POSTCONDITION: Writes to file the assembly code for: @R13, M=D
+     */
     private void popValueToDestinationAddress()
     {
         printWriter.println("@SP");         // go to Stack Pointer
