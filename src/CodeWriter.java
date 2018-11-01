@@ -343,7 +343,7 @@ public class CodeWriter
      * "temp", "static".
      * POSTCONDITION: The file will be appended with the commands for: Go to segment index, Store literal value in D,
      *
-     * @param segment The part of memory to access.
+     * @param segment The segment of memory to access.
      * @param index The specific index in memory segment to access.
      */
     private void writePush(String segment, int index)
@@ -531,14 +531,25 @@ public class CodeWriter
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////// POP METHODS //////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+
+    /** pointer implementation
+     * push pointer 0, this
+     * pop pointer 1, that
+     */
+
 
     /**
-     * DESCRIPTION:
-     * PRECONDITION:
-     * POSTCONDITION:
+
      *
-     * @param segment
-     * @param index
+     * DESCRIPTION: Writes the assembly instructions for "pop segment i", where segment i is the memory segment to pop
+     * to, and i represents the specific index of said segment to pop to.
+     * PRECONDITION: segment must be one of the following commands: "constant", "local", "argument", "this", "that",
+     * "temp", "static", "pointer".
+     * POSTCONDITION: The file will be appended with the commands for: Pop top most value of stack into segmente i.
+     *
+     * @param segment The segment of memory to access.
+     * @param index The specific index in memory segment to access.
      */
     private void writePop(String segment, int index)
     {
@@ -578,6 +589,13 @@ public class CodeWriter
         }
     }
 
+    /**
+     * DESCRIPTION:
+     * PRECONDITION:
+     * POSTCONDITION:
+     *
+     * @param index
+     */
     private void popLCL(int index)
     {
         loadDwith(index);                       // @ + index, D=A
