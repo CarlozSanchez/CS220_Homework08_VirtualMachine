@@ -313,7 +313,8 @@ public class CodeWriter
     {
 
         // Prints the current operation as comment to file.
-        printWriter.printf("// %s %s %s\n", command, segment, index);
+       // printWriter.printf("// %s %s %s\n", command, segment, index);
+        printWriter.println("// " + command + " " + segment + " " + index);
 
         switch (command)
         {
