@@ -1,7 +1,7 @@
 // FileName: VirtualMachinePart1.java
 // Programer: Carlos Sanchez
 // Class: CS220 MW 3:30pm - 5:20pm
-// Lst Update: 10/31/2018
+// Lst Update: 11/7/2018
 // Version 1.0
 
 
@@ -43,7 +43,6 @@ public class VirtualMachinePart1
 
         outputFileName = inputFileName.substring(0, inputFileName.lastIndexOf('.')) + ".asm";
 
-        // TODO: finish driver as algorithm describes
         parseVM(inputFileName, outputFileName);
     }
 
@@ -59,8 +58,8 @@ public class VirtualMachinePart1
      *         write Arithmetic command to CodeWriter
      * close file and update user.
      *
-     * @param fileName
-     * @param outputFileName
+     * @param fileName The name of the file to parse.
+     * @param outputFileName The name of the file to output too.
      */
     private static void parseVM(String fileName, String outputFileName)
     {
@@ -83,14 +82,14 @@ public class VirtualMachinePart1
         {
             codeWriter = new CodeWriter(outputFileName);
         }
-        catch (FileNotFoundException ex)
+        catch (FileNotFoundException e)
         {
             System.err.println("Could not open output file " + outputFileName);
             System.err.println("Run program again, make sure you have write permissions, etc.");
             System.exit(0);
         }
 
-
+        // Parse the VM File
         while (parser.hasMoreCommands())
         {
             parser.advance();
