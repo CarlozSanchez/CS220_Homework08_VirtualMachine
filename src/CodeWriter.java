@@ -394,9 +394,8 @@ public class CodeWriter
      * DESCRIPTION: Writes the assembly commands for pushing a "costant" value into stack.
      * PRECONDITION: index is a none negative number within memory range(0-max)
      * POSTCONDTION: The file will be appended with the commands: @+index, D=A,
-     *
-     * @param index the index of memory segment CONSTANT we want to push from.
      * @SP, M=M+1, A=M-1, M=D
+     * @param index the index of memory segment CONSTANT we want to push from.
      */
     private void pushCONSTANT(int index)
     {
@@ -408,9 +407,8 @@ public class CodeWriter
      * DESCRIPTION: Writes the assembly commands for pushing a "local" value into stack.
      * PRECONDITION: index is a none negative number within memory range(0-max)
      * POSTCONDTION: The file will be appended with the commands: @+index, D=A,
-     *
-     * @param index the index of memory segment LCL we want to push from.
      * @LCL, A=M+D, D=M, @SP, M=M+1, A=M-1, M=D
+     * @param index the index of memory segment LCL we want to push from.
      */
     private void pushLCL(int index)
     {
@@ -424,9 +422,8 @@ public class CodeWriter
      * DESCRIPTION: Writes the assembly commands for pushing an "argument" value into stack.
      * PRECONDITION: index is a none negative number within memory range(0-max)
      * POSTCONDTION: The file will be appended with the commands: @+index, D=A,
-     *
-     * @param index the index of memory segment ARG we want to push from.
      * @ARG, A=M+D, D=M, @SP, M=M+1, A=M-1, M=D
+     * @param index the index of memory segment ARG we want to push from.
      */
     private void pushARG(int index)
     {
@@ -440,9 +437,8 @@ public class CodeWriter
      * DESCRIPTION: Writes the assembly commands for pushing a "this" value into stack.
      * PRECONDITION: index is a none negative number within memory range(0-max)
      * POSTCONDTION: The file will be appended with the commands: @+index, D=A,
-     *
-     * @param index the index of memory segment THIS we want to push from.
      * @THIS, A=M+D, D=M, @SP, M=M+1, A=M-1, M=D
+     * @param index the index of memory segment THIS we want to push from.
      */
     private void pushTHIS(int index)
     {
@@ -456,9 +452,8 @@ public class CodeWriter
      * DESCRIPTION: Writes the assembly commands for pushing a "that" value into stack.
      * PRECONDITION: index is a none negative number within memory range(0-max)
      * POSTCONDTION: The file will be appended with the commands: @+index, D=A,
-     *
-     * @param index the index of memory segment THAT we want to push from.
      * @THAT, A=M+D, D=M, @SP, M=M+1, A=M-1, M=D
+     * @param index the index of memory segment THAT we want to push from.
      */
     private void pushTHAT(int index)
     {
@@ -472,9 +467,8 @@ public class CodeWriter
      * DESCRIPTION: Writes the assembly commands for pushing a "temp" value into stack.
      * PRECONDITION: index is a none negative number within memory range(0-max)
      * POSTCONDTION: The file will be appended with the commands: @+index, D=A,
-     *
-     * @param index the index of memory segment TEMP we want to push from.
      * @THAT, A=A+1, A=A+D, D=M, @SP, M=M+1, A=M-1, M=D
+     * @param index the index of memory segment TEMP we want to push from.
      */
     private void pushTEMP(int index)
     {
@@ -491,7 +485,6 @@ public class CodeWriter
      * PRECONDITION: index is a none negative number within memory range(0-max)
      * POSTCONDTION: The file will be appended with the commands: @Codewriter.i,
      * D=M, @SP, M=M+1, A=M-1, M=D
-     *
      * @param index the index of memory segment STATIC we want to push from.
      */
     private void pushSTATIC(int index)
@@ -628,9 +621,9 @@ public class CodeWriter
      * DESCRIPTION: Pops values from stack into LCL[index].
      * PRECONDITION: none.
      * POSTCONDITION:   Writes to file the assembly code for: @+index, D=a, @LCL, D=D+M, @R13, M=D, @SP, AM=M-1, D=m,
-     *
-     * @param index The LCL[index] to pop value too.
      * @R13, A=M, M=D
+     * @param index The LCL[index] to pop value too.
+
      */
     private void popLCL(int index)
     {
@@ -647,9 +640,8 @@ public class CodeWriter
      * DESCRIPTION: Pops values from stack into ARG[index].
      * PRECONDITION: none.
      * POSTCONDITION:   Writes to file the assembly code for: @+index, D=A, @ARG, D=D+M, @R13, M=D, @SP, AM=M-1, D=m,
-     *
-     * @param index The ARG[index] to pop value too.
      * @R13, A=M, M=D
+     * @param index The ARG[index] to pop value too.
      */
     private void popARG(int index)
     {
@@ -666,9 +658,8 @@ public class CodeWriter
      * DESCRIPTION: Pops values from stack into THIS[index].
      * PRECONDITION: none.
      * POSTCONDITION:   Writes to file the assembly code for: @+index, D=A, @THIS, D=D+M, @R13, M=D, @SP, AM=M-1, D=m,
-     *
-     * @param index The THIS[index] to pop value too.
      * @R13, A=M, M=D
+     * @param index The THIS[index] to pop value too.
      */
     private void popTHIS(int index)
     {
@@ -685,9 +676,8 @@ public class CodeWriter
      * DESCRIPTION: Pops values from stack into THAT[index].
      * PRECONDITION: none.
      * POSTCONDITION:   Writes to file the assembly code for: @+index, D=A, @THAT, D=D+M, @R13, M=D, @SP, AM=M-1, D=m,
-     *
-     * @param index The THAT[index] to pop value too.
      * @R13, A=M, M=D
+     * @param index The THAT[index] to pop value too.
      */
     private void popTHAT(int index)
     {
@@ -704,9 +694,8 @@ public class CodeWriter
      * DESCRIPTION: Pops values from stack into TEMP[index].
      * PRECONDITION: none.
      * POSTCONDITION: Writes to file the assembly code for: @+index, D=A, @THAT, A=A+1, D=D+M, @R13, M=D, @SP, AM=M-1, D=m,
-     *
-     * @param index The THAT[index] to pop value too.
      * @R13, A=M, M=D
+     * @param index The THAT[index] to pop value too.
      */
     private void popTEMP(int index)
     {
